@@ -1,30 +1,28 @@
+use std::ops::Range;
+
 use chumsky::prelude::*;
 use common::DayResult;
-
+use range_collections::{range_set::RangeSetRange, RangeSet2};
 pub struct Solver;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct RangeMapping {
-    destination: u64,
-    source: u64,
-    size: u64,
+    destination: i64,
+    source: i64,
+    size: i64,
 }
 
 impl RangeMapping {
-    fn map(&self, element: u64) -> Option<u64> {
-        if element >= self.source && element < self.source + self.size {
+    fn map(&self, element: i64) -> Option<i64> {
+        if self.source_range().contains(&element) {
             Some(self.destination + (element - self.source))
         } else {
             None
         }
     }
 
-    fn reverse_map(&self, element: u64) -> Option<u64> {
-        if element >= self.destination && element < self.destination + self.size {
-            Some(self.source + (element - self.destination))
-        } else {
-            None
-        }
+    fn source_range(&self) -> Range<i64> {
+        self.source..self.source + self.size
     }
 }
 
@@ -32,28 +30,38 @@ impl RangeMapping {
 struct Mapping {
     _from: String,
     _to: String,
-    ranges: Vec<RangeMapping>,
+    mappings: Vec<RangeMapping>,
 }
+type RangeSet = RangeSet2<i64>;
+
 impl Mapping {
-    fn map(&self, element: u64) -> u64 {
-        self.ranges
+    fn map(&self, element: i64) -> i64 {
+        self.mappings
             .iter()
             .find_map(|r| r.map(element))
             .unwrap_or(element)
     }
 
-    fn reverse_map(&self, element: u64) -> u64 {
-        self.ranges
-            .iter()
-            .find_map(|r| r.reverse_map(element))
-            .unwrap_or(element)
+    fn map_range(&self, mut range: RangeSet) -> RangeSet {
+        let mut res = RangeSet::empty();
+        for mapping in &self.mappings {
+            // Extract from input range values that are mapped by the current
+            // mapping and add it to ouput
+            let to_map = RangeSet::from(mapping.source_range()) & &range;
+            res |= offset_range(&to_map, mapping.destination - mapping.source);
+
+            // Remove processed range from input
+            range ^= to_map;
+        }
+        // Map unmapped ranges to identity
+        res | range
     }
 }
 
 #[derive(Debug)]
 struct Input {
-    individual_seeds: Vec<u64>,
-    range_seeds: Vec<std::ops::Range<u64>>,
+    individual_seeds: Vec<i64>,
+    range_seeds: RangeSet,
     mappings: Vec<Mapping>,
 }
 
@@ -75,31 +83,34 @@ impl common::DualDaySolver for Solver {
     fn solve_2(&self, input: &str) -> DayResult {
         let input = parser().parse(input).unwrap();
 
-        for location in 0..u64::MAX {
-            let mut element = location;
+        let mut ranges = input.range_seeds.clone();
 
-            for mapping in input.mappings.iter().rev() {
-                element = mapping.reverse_map(element);
-            }
-            if input.range_seeds.iter().any(|r| r.contains(&element)) {
-                return DayResult::new(location);
-            }
+        for mapping in &input.mappings {
+            ranges = mapping.map_range(ranges);
         }
 
-        unreachable!("(until a long time)")
+        DayResult::new(match ranges.iter().next().unwrap() {
+            RangeSetRange::Range(r) => r.start,
+            RangeSetRange::RangeFrom(_) => unreachable!(),
+        })
     }
 }
 
 fn parser() -> impl Parser<char, Input, Error = Simple<char>> {
-    let number = text::int(10).map(|i: String| i.parse::<u64>().unwrap());
+    let number = text::int(10).map(|i: String| i.parse::<i64>().unwrap());
 
     let seeds = just("seeds: ").ignore_then(
         number.separated_by(text::whitespace()).rewind().then(
-            (number
+            ((number
                 .separated_by(text::whitespace())
                 .exactly(2)
                 .map(|n| n[0]..n[0] + n[1]))
-            .separated_by(text::whitespace()),
+            .separated_by(text::whitespace()))
+            .map(|ranges| {
+                ranges
+                    .into_iter()
+                    .fold(RangeSet::empty(), |acc, r| acc | RangeSet::from(r))
+            }),
         ),
     );
 
@@ -120,7 +131,7 @@ fn parser() -> impl Parser<char, Input, Error = Simple<char>> {
         .map(|((from, to), ranges)| Mapping {
             _from: from,
             _to: to,
-            ranges,
+            mappings: ranges,
         });
 
     seeds
@@ -132,4 +143,16 @@ fn parser() -> impl Parser<char, Input, Error = Simple<char>> {
             mappings,
         })
         .then_ignore(end())
+}
+
+// Offset a range by the provided amount.
+fn offset_range(range: &RangeSet, offset: i64) -> RangeSet {
+    let mut res = RangeSet::empty();
+    for part in range.iter() {
+        res |= match part {
+            RangeSetRange::Range(s) => RangeSet::from(*s.start + offset..*s.end + offset),
+            RangeSetRange::RangeFrom(_) => unreachable!(),
+        };
+    }
+    res
 }

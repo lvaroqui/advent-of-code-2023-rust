@@ -9,3 +9,4 @@ edition = "2021"
 common.path = "../common"
 itertools.workspace = true
 chumsky.workspace = true
+range-collections = "0.4.5"
