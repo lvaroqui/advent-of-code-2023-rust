@@ -4,6 +4,8 @@ members = ["common", "cli", "day*"]
 [workspace.dependencies]
 itertools = "0.12"
 chumsky = "0.9.3"
+strum = "0.25.0"
+strum_macros = "0.25.3"
 
 [profile.release]
 debug = true
