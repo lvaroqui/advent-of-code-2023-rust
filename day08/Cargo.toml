@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 common.path = "../common"
 itertools.workspace = true
-rayon = "1.6.0"
-take-until = "0.1.0"
+chumsky.workspace = true
+num.workspace = true
