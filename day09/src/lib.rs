@@ -2,86 +2,61 @@ use std::collections::VecDeque;
 
 use common::DayResult;
 use itertools::Itertools;
+use std::ops::{Add, Sub};
 
 pub struct Solver;
 
 impl common::DualDaySolver for Solver {
     fn solve_1(&self, input: &str) -> DayResult {
-        let series = input
-            .lines()
-            .map(|line| {
-                line.split_whitespace()
-                    .map(|n| n.parse::<i32>().unwrap())
-                    .collect_vec()
-            })
-            .collect_vec();
-
-        let mut sum = 0;
-
-        for serie in series {
-            let mut stack = vec![serie];
-
-            while stack.last().unwrap().iter().any(|e| *e != 0) {
-                let mut derivative = vec![];
-                for window in stack.last().unwrap().windows(2) {
-                    derivative.push(window[1] - window[0])
-                }
-                stack.push(derivative)
-            }
-
-            stack.last_mut().unwrap().push(0);
-
-            while stack.len() > 1 {
-                let poped = stack.pop().unwrap();
-                let last = stack.last_mut().unwrap();
-                let last_value = *last.last().unwrap();
-                last.push(last_value + poped.last().unwrap())
-            }
-
-            sum += stack.last().unwrap().last().unwrap();
-        }
-
-        DayResult::new(sum)
+        solve(input, VecDeque::back, VecDeque::push_back, i32::add)
     }
 
     fn solve_2(&self, input: &str) -> DayResult {
-        let series = input
-            .lines()
-            .map(|line| {
-                line.split_whitespace()
-                    .map(|n| n.parse::<i32>().unwrap())
-                    .collect::<VecDeque<_>>()
-            })
-            .collect_vec();
+        solve(input, VecDeque::front, VecDeque::push_front, i32::sub)
+    }
+}
 
-        let mut sum = 0;
+fn solve(
+    input: &str,
+    value_getter: impl Fn(&VecDeque<i32>) -> Option<&i32>,
+    value_pusher: impl Fn(&mut VecDeque<i32>, i32),
+    op: impl Fn(i32, i32) -> i32,
+) -> DayResult {
+    let series = input
+        .lines()
+        .map(|line| {
+            line.split_whitespace()
+                .map(|n| n.parse::<i32>().unwrap())
+                .collect::<VecDeque<_>>()
+        })
+        .collect_vec();
 
-        for serie in series {
-            let mut stack = vec![serie];
+    let mut sum = 0;
 
-            while stack.last().unwrap().iter().any(|e| *e != 0) {
-                let derivative = stack
-                    .last()
-                    .unwrap()
-                    .iter()
-                    .tuple_windows()
-                    .map(|(left, right)| right - left)
-                    .collect::<VecDeque<_>>();
-                stack.push(derivative)
-            }
+    for serie in series {
+        let mut stack = vec![serie];
 
-            stack.last_mut().unwrap().push_front(0);
-
-            while stack.len() > 1 {
-                let poped = stack.pop().unwrap();
-                let last = stack.last_mut().unwrap();
-                let first_value = *last.front().unwrap();
-                last.push_front(first_value - poped.front().unwrap())
-            }
-
-            sum += stack.last().unwrap().front().unwrap();
+        while stack.last().unwrap().iter().any(|e| *e != 0) {
+            let derivative = stack
+                .last()
+                .unwrap()
+                .iter()
+                .tuple_windows()
+                .map(|(left, right)| right - left)
+                .collect();
+            stack.push(derivative)
         }
 
-        DayResult::new(sum)
+        while stack.len() > 1 {
+            // Remove top of stack and get value for modification of bellow level
+            let popped_value = *value_getter(&stack.pop().unwrap()).unwrap();
+            let to_modify = stack.last_mut().unwrap();
+            let value = *value_getter(to_modify).unwrap();
+            value_pusher(to_modify, op(value, popped_value))
+        }
+
+        sum += value_getter(stack.last().unwrap()).unwrap();
     }
+
+    DayResult::new(sum)
 }
