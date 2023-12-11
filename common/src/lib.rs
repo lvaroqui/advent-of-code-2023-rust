@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+pub mod map;
+
 #[derive(Default)]
 pub struct DayResult(Option<Box<dyn Display>>);
 
