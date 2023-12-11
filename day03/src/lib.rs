@@ -1,6 +1,9 @@
 use std::collections::{HashMap, HashSet};
 
-use common::DayResult;
+use common::{
+    map::{vec2, Map},
+    DayResult,
+};
 use itertools::Itertools;
 
 pub struct Solver;
@@ -10,32 +13,6 @@ enum Element {
     Gear(u32),
     Part,
     None,
-}
-struct Map(Vec<Vec<Element>>);
-impl Map {
-    fn adjacent_iter(&self, x: usize, y: usize) -> impl Iterator<Item = &Element> {
-        let x = x as isize;
-        let y = y as isize;
-        [
-            // Line above
-            (x - 1, y - 1),
-            (x, y - 1),
-            (x + 1, y - 1),
-            // Left
-            (x - 1, y),
-            //Right
-            (x + 1, y),
-            // Line bellow
-            (x - 1, y + 1),
-            (x, y + 1),
-            (x + 1, y + 1),
-        ]
-        .into_iter()
-        .filter(|&(x, y)| {
-            x >= 0 && x < self.0[0].len() as isize && y >= 0 && y < self.0.len() as isize
-        })
-        .map(|(x, y)| &self.0[y as usize][x as usize])
-    }
 }
 
 #[derive(Default)]
@@ -108,25 +85,27 @@ fn solve<NumberMetadata: Default>(
     // Parse map
     let lines = input.split('\n');
     let mut gear_id = 0;
-    let map = Map(lines
-        .map(|line| {
-            line.chars()
-                .map(|c| match c {
-                    c if c.is_numeric() => Element::Digit(c.to_digit(10).unwrap() as u8),
-                    '.' => Element::None,
-                    '*' => {
-                        gear_id += 1;
-                        Element::Gear(gear_id)
-                    }
-                    _part => Element::Part,
-                })
-                .collect_vec()
-        })
-        .collect_vec());
+    let map = Map::new(
+        lines
+            .map(|line| {
+                line.chars()
+                    .map(|c| match c {
+                        c if c.is_numeric() => Element::Digit(c.to_digit(10).unwrap() as u8),
+                        '.' => Element::None,
+                        '*' => {
+                            gear_id += 1;
+                            Element::Gear(gear_id)
+                        }
+                        _part => Element::Part,
+                    })
+                    .collect_vec()
+            })
+            .collect_vec(),
+    );
 
     let mut numbers = vec![];
 
-    for (y, line) in map.0.iter().enumerate() {
+    for (y, line) in map.inner().iter().enumerate() {
         let mut current_number: Option<Number<NumberMetadata>> = None;
 
         // Iterating in reverse allows easy parsing of the numbers (by reading
@@ -144,7 +123,7 @@ fn solve<NumberMetadata: Default>(
                 c.value += 10_u32.pow(c.digit_index) * *digit as u32;
                 c.digit_index += 1;
 
-                for a in map.adjacent_iter(x, y) {
+                for a in map.adjacent_iter(vec2(x as i64, y as i64)) {
                     inspect_number_neighbour(&mut c.metadata, a);
                 }
             } else {
