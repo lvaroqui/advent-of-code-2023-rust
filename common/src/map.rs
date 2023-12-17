@@ -22,6 +22,11 @@ impl<T> Map<T> {
     }
 
     pub fn adjacent_iter(&self, pos: Vec2) -> impl Iterator<Item = &T> {
+        self.adjacent_pos_iter(pos)
+            .map(|pos| &self.0[pos.y as usize][pos.x as usize])
+    }
+
+    pub fn adjacent_pos_iter(&self, pos: Vec2) -> impl Iterator<Item = Vec2> + '_ {
         let x = pos.x;
         let y = pos.y;
         [
@@ -45,7 +50,6 @@ impl<T> Map<T> {
                 && pos.y >= 0
                 && pos.y < self.0.len() as i64
         })
-        .map(|pos| &self.0[pos.y as usize][pos.x as usize])
     }
 
     pub fn get(&self, pos: Vec2) -> Option<&T> {
@@ -65,7 +69,7 @@ impl<T> std::ops::Index<Vec2> for Map<T> {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Vec2 {
     pub x: i64,
     pub y: i64,
