@@ -1,5 +1,5 @@
 [workspace]
-members = ["common", "cli", "day*"]
+members = ["common", "cli", "years/*/day*", "years/*/year"]
 
 [workspace.dependencies]
 itertools = "0.12"
@@ -7,6 +7,7 @@ chumsky = "0.9.3"
 strum = "0.25.0"
 strum_macros = "0.25.3"
 num = "0.4.1"
+common = { path = "common" }
 
 [profile.release]
 debug = true
