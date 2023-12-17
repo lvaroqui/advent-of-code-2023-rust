@@ -43,50 +43,53 @@ impl common::DualDaySolver for Solver {
                 .collect_vec(),
         );
 
-        let (start, _) = map
-            .iter()
-            .find(|(_pos, val)| **val == Element::Start)
-            .unwrap();
+        DayResult::new(pipe_iter(&map).count() / 2)
+    }
+}
 
-        use Element as E;
-        let (first_direction, first_step, _) = [
-            (Vec2::LEFT, &[E::Horizontal, E::BottomLeft, E::TopLeft]),
-            (Vec2::RIGHT, &[E::Horizontal, E::BottomRight, E::TopRight]),
-            (Vec2::UP, &[E::Vertical, E::TopLeft, E::TopRight]),
-            (Vec2::DOWN, &[E::Vertical, E::BottomLeft, E::BottomRight]),
-        ]
-        .into_iter()
-        .map(|(direction, valid)| (direction, start + direction, valid))
-        .find(|(_direction, pos, valid)| {
-            let Some(elem) = map.get(*pos) else {
-                return false;
-            };
-            valid.contains(elem)
-        })
+fn pipe_iter(map: &Map<Element>) -> impl Iterator<Item = (Vec2, Element)> + '_ {
+    use Element as E;
+
+    let (start, _) = map
+        .iter()
+        .find(|(_pos, val)| **val == Element::Start)
         .unwrap();
 
-        let mut from_dir = first_direction;
-        let mut to = first_step;
-        let mut sum = 1;
-        loop {
-            from_dir = match map[to] {
-                E::Vertical | E::Horizontal => from_dir,
-                E::BottomLeft if from_dir == Vec2::LEFT => Vec2::UP,
-                E::BottomLeft if from_dir == Vec2::DOWN => Vec2::RIGHT,
-                E::TopRight if from_dir == Vec2::RIGHT => Vec2::DOWN,
-                E::TopRight if from_dir == Vec2::UP => Vec2::LEFT,
-                E::TopLeft if from_dir == Vec2::LEFT => Vec2::DOWN,
-                E::TopLeft if from_dir == Vec2::UP => Vec2::RIGHT,
-                E::BottomRight if from_dir == Vec2::RIGHT => Vec2::UP,
-                E::BottomRight if from_dir == Vec2::DOWN => Vec2::LEFT,
-                E::Start => break,
-                E::Ground => unreachable!(),
-                other => unreachable!("{:?}", other),
-            };
-            to = to + from_dir;
-            sum += 1;
-        }
+    let (first_direction, first_step, _) = [
+        (Vec2::LEFT, &[E::Horizontal, E::BottomLeft, E::TopLeft]),
+        (Vec2::RIGHT, &[E::Horizontal, E::BottomRight, E::TopRight]),
+        (Vec2::UP, &[E::Vertical, E::TopLeft, E::TopRight]),
+        (Vec2::DOWN, &[E::Vertical, E::BottomLeft, E::BottomRight]),
+    ]
+    .into_iter()
+    .map(|(direction, valid)| (direction, start + direction, valid))
+    .find(|(_direction, pos, valid)| {
+        let Some(elem) = map.get(*pos) else {
+            return false;
+        };
+        valid.contains(elem)
+    })
+    .unwrap();
 
-        DayResult::new(sum / 2)
-    }
+    let mut from_dir = first_direction;
+    let mut to = first_step;
+    std::iter::once((start, map[start])).chain(std::iter::from_fn(move || {
+        let res = (to, map[to]);
+        from_dir = match map[to] {
+            E::Vertical | E::Horizontal => from_dir,
+            E::BottomLeft if from_dir == Vec2::LEFT => Vec2::UP,
+            E::BottomLeft if from_dir == Vec2::DOWN => Vec2::RIGHT,
+            E::TopRight if from_dir == Vec2::RIGHT => Vec2::DOWN,
+            E::TopRight if from_dir == Vec2::UP => Vec2::LEFT,
+            E::TopLeft if from_dir == Vec2::LEFT => Vec2::DOWN,
+            E::TopLeft if from_dir == Vec2::UP => Vec2::RIGHT,
+            E::BottomRight if from_dir == Vec2::RIGHT => Vec2::UP,
+            E::BottomRight if from_dir == Vec2::DOWN => Vec2::LEFT,
+            E::Start => return None,
+            E::Ground => unreachable!(),
+            other => unreachable!("{:?}", other),
+        };
+        to = to + from_dir;
+        Some(res)
+    }))
 }
