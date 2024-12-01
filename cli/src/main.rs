@@ -15,7 +15,7 @@ use reqwest::blocking::Client;
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// Year to solve
-    #[arg(short, long, value_parser = clap::value_parser!(u16).range(2023..=2023))]
+    #[arg(short, long, value_parser = clap::value_parser!(u16).range(2022..=2023))]
     year: u16,
 
     /// Day to solve
@@ -118,7 +118,7 @@ fn solve_day(
     ),
     anyhow::Error,
 > {
-    let solver: DaySolver = match_years!([2023], year, day);
+    let solver: DaySolver = match_years!([2022, 2023], year, day);
     let mut path = PathBuf::from("inputs").join(year.to_string());
     std::fs::create_dir_all(&path)?;
     path.push(day.to_string());
@@ -127,7 +127,10 @@ fn solve_day(
         let session_key = std::fs::read_to_string("session-key")
             .with_context(|| "could not open `session-key` file")?;
         let mut req = client
-            .get(format!("https://adventofcode.com/2023/day/{}/input", day))
+            .get(format!(
+                "https://adventofcode.com/{}/day/{}/input",
+                year, day
+            ))
             .header("Cookie", format!("session={}", session_key))
             .send()?
             .error_for_status()

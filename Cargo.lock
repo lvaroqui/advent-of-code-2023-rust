@@ -221,6 +221,7 @@ dependencies = [
  "comfy-table",
  "common",
  "reqwest",
+ "year2022",
  "year2023",
 ]
 
@@ -266,6 +267,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
+name = "crossbeam-deque"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "613f8cc01fe9cf1a3eb3d7f488fd2fa8388403e97039e2f73692932e291a770d"
+dependencies = [
+ "crossbeam-epoch",
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-epoch"
+version = "0.9.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e"
+dependencies = [
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-utils"
+version = "0.8.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22ec99545bb0ed0ea7bb9b8e1e9122ea386ff8a48c0922e43f36d45ab09e0e80"
+
+[[package]]
 name = "crossterm"
 version = "0.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -285,208 +311,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acdd7c62a3665c7f6830a51635d9ac9b23ed385797f70a83bb8bafe9c572ab2b"
 dependencies = [
  "winapi",
-]
-
-[[package]]
-name = "day01"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day02"
-version = "0.1.0"
-dependencies = [
- "chumsky",
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day03"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day04"
-version = "0.1.0"
-dependencies = [
- "chumsky",
- "common",
-]
-
-[[package]]
-name = "day05"
-version = "0.1.0"
-dependencies = [
- "chumsky",
- "common",
- "itertools",
- "range-collections",
-]
-
-[[package]]
-name = "day06"
-version = "0.1.0"
-dependencies = [
- "chumsky",
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day07"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
- "strum",
- "strum_macros",
-]
-
-[[package]]
-name = "day08"
-version = "0.1.0"
-dependencies = [
- "chumsky",
- "common",
- "itertools",
- "num",
-]
-
-[[package]]
-name = "day09"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day10"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day11"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day12"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
- "petgraph",
-]
-
-[[package]]
-name = "day13"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day14"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
- "num",
-]
-
-[[package]]
-name = "day15"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day16"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day17"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day18"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day19"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day20"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day21"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day22"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day23"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
-]
-
-[[package]]
-name = "day24"
-version = "0.1.0"
-dependencies = [
- "common",
- "itertools",
 ]
 
 [[package]]
@@ -1306,6 +1130,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "rayon"
+version = "1.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b418a60154510ca1a002a752ca9714984e21e4241e804d32555251faf8b78ffa"
+dependencies = [
+ "either",
+ "rayon-core",
+]
+
+[[package]]
+name = "rayon-core"
+version = "1.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2"
+dependencies = [
+ "crossbeam-deque",
+ "crossbeam-utils",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1683,6 +1527,12 @@ dependencies = [
  "core-foundation-sys",
  "libc",
 ]
+
+[[package]]
+name = "take-until"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4e17d8598067a8c134af59cd33c1c263470e089924a11ab61cf61690919fe3b"
 
 [[package]]
 name = "tempfile"
@@ -2086,34 +1936,462 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 
 [[package]]
+name = "year2022"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "year2022_day01",
+ "year2022_day02",
+ "year2022_day03",
+ "year2022_day04",
+ "year2022_day05",
+ "year2022_day06",
+ "year2022_day07",
+ "year2022_day08",
+ "year2022_day09",
+ "year2022_day10",
+ "year2022_day11",
+ "year2022_day12",
+ "year2022_day13",
+ "year2022_day14",
+ "year2022_day15",
+ "year2022_day16",
+ "year2022_day17",
+ "year2022_day18",
+ "year2022_day19",
+ "year2022_day20",
+ "year2022_day21",
+ "year2022_day22",
+ "year2022_day23",
+ "year2022_day24",
+]
+
+[[package]]
+name = "year2022_day01"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day02"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day03"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day04"
+version = "0.1.0"
+dependencies = [
+ "common",
+]
+
+[[package]]
+name = "year2022_day05"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day06"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day07"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day08"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+ "rayon",
+ "take-until",
+]
+
+[[package]]
+name = "year2022_day09"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day10"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day11"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day12"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+ "petgraph",
+]
+
+[[package]]
+name = "year2022_day13"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day14"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+ "num",
+]
+
+[[package]]
+name = "year2022_day15"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day16"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day17"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day18"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day19"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day20"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day21"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day22"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day23"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2022_day24"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
 name = "year2023"
 version = "0.1.0"
 dependencies = [
  "common",
- "day01",
- "day02",
- "day03",
- "day04",
- "day05",
- "day06",
- "day07",
- "day08",
- "day09",
- "day10",
- "day11",
- "day12",
- "day13",
- "day14",
- "day15",
- "day16",
- "day17",
- "day18",
- "day19",
- "day20",
- "day21",
- "day22",
- "day23",
- "day24",
+ "year2023_day01",
+ "year2023_day02",
+ "year2023_day03",
+ "year2023_day04",
+ "year2023_day05",
+ "year2023_day06",
+ "year2023_day07",
+ "year2023_day08",
+ "year2023_day09",
+ "year2023_day10",
+ "year2023_day11",
+ "year2023_day12",
+ "year2023_day13",
+ "year2023_day14",
+ "year2023_day15",
+ "year2023_day16",
+ "year2023_day17",
+ "year2023_day18",
+ "year2023_day19",
+ "year2023_day20",
+ "year2023_day21",
+ "year2023_day22",
+ "year2023_day23",
+ "year2023_day24",
+]
+
+[[package]]
+name = "year2023_day01"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day02"
+version = "0.1.0"
+dependencies = [
+ "chumsky",
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day03"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day04"
+version = "0.1.0"
+dependencies = [
+ "chumsky",
+ "common",
+]
+
+[[package]]
+name = "year2023_day05"
+version = "0.1.0"
+dependencies = [
+ "chumsky",
+ "common",
+ "itertools",
+ "range-collections",
+]
+
+[[package]]
+name = "year2023_day06"
+version = "0.1.0"
+dependencies = [
+ "chumsky",
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day07"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+ "strum",
+ "strum_macros",
+]
+
+[[package]]
+name = "year2023_day08"
+version = "0.1.0"
+dependencies = [
+ "chumsky",
+ "common",
+ "itertools",
+ "num",
+]
+
+[[package]]
+name = "year2023_day09"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day10"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day11"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day12"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+ "petgraph",
+]
+
+[[package]]
+name = "year2023_day13"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day14"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+ "num",
+]
+
+[[package]]
+name = "year2023_day15"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day16"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day17"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day18"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day19"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day20"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day21"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day22"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day23"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
+]
+
+[[package]]
+name = "year2023_day24"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "itertools",
 ]
 
 [[package]]
