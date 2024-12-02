@@ -1,26 +1,37 @@
 use std::{io::Write, path::PathBuf};
 
-use anyhow::Context;
-
-const TOML_HEADER: &str = r#"
-[package]
-name = "generated"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-"#;
+use anyhow::{bail, Context};
 
 fn main() -> anyhow::Result<()> {
     let workspace_root: PathBuf = std::env::args()
         .nth(1)
         .with_context(|| "Workspace root missing as first param")?
         .into();
-    std::fs::create_dir_all(workspace_root.join("generated/src"))?;
-    let mut toml = std::fs::File::create(workspace_root.join("generated/Cargo.toml"))?;
-    toml.write_all(TOML_HEADER.as_bytes())?;
 
-    let mut lib = std::fs::File::create(workspace_root.join("generated/src/lib.rs"))?;
+    let command = std::env::args()
+        .nth(2)
+        .with_context(|| "Command missing as second param")?;
+
+    match command.as_str() {
+        "generate_imports" => generate_imports(workspace_root),
+        _ => bail!("Unknown command `{command}`"),
+    }
+}
+
+const TOML_HEADER: &str = r#"
+[package]
+name = "imports"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+"#;
+
+fn generate_imports(workspace_root: PathBuf) -> Result<(), anyhow::Error> {
+    std::fs::create_dir_all(workspace_root.join("imports/src"))?;
+    let mut toml = std::fs::File::create(workspace_root.join("imports/Cargo.toml"))?;
+    toml.write_all(TOML_HEADER.as_bytes())?;
+    let mut lib = std::fs::File::create(workspace_root.join("imports/src/lib.rs"))?;
 
     for year in std::fs::read_dir(workspace_root.join("years"))? {
         let year_path = year?;

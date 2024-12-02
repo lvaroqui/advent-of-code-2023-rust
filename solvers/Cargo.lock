@@ -220,7 +220,7 @@ dependencies = [
  "clap",
  "comfy-table",
  "common",
- "generated",
+ "imports",
  "reqwest",
 ]
 
@@ -445,37 +445,6 @@ dependencies = [
  "pin-project-lite",
  "pin-utils",
  "slab",
-]
-
-[[package]]
-name = "generated"
-version = "0.1.0"
-dependencies = [
- "year2022_day01",
- "year2022_day02",
- "year2022_day03",
- "year2022_day04",
- "year2022_day05",
- "year2022_day06",
- "year2022_day07",
- "year2022_day08",
- "year2022_day09",
- "year2022_day10",
- "year2022_day11",
- "year2022_day12",
- "year2022_day13",
- "year2022_day14",
- "year2023_day01",
- "year2023_day02",
- "year2023_day03",
- "year2023_day04",
- "year2023_day05",
- "year2023_day06",
- "year2023_day07",
- "year2023_day08",
- "year2023_day09",
- "year2023_day10",
- "year2024_day01",
 ]
 
 [[package]]
@@ -785,6 +754,37 @@ checksum = "daca1df1c957320b2cf139ac61e7bd64fed304c5040df000a745aa1de3b4ef71"
 dependencies = [
  "icu_normalizer",
  "icu_properties",
+]
+
+[[package]]
+name = "imports"
+version = "0.1.0"
+dependencies = [
+ "year2022_day01",
+ "year2022_day02",
+ "year2022_day03",
+ "year2022_day04",
+ "year2022_day05",
+ "year2022_day06",
+ "year2022_day07",
+ "year2022_day08",
+ "year2022_day09",
+ "year2022_day10",
+ "year2022_day11",
+ "year2022_day12",
+ "year2022_day13",
+ "year2022_day14",
+ "year2023_day01",
+ "year2023_day02",
+ "year2023_day03",
+ "year2023_day04",
+ "year2023_day05",
+ "year2023_day06",
+ "year2023_day07",
+ "year2023_day08",
+ "year2023_day09",
+ "year2023_day10",
+ "year2024_day01",
 ]
 
 [[package]]

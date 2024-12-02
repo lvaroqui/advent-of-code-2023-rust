@@ -1,5 +1,5 @@
 [workspace]
-members = ["common", "cli", "generated", "years/*/day*"]
+members = ["common", "cli", "imports", "years/*/day*"]
 resolver = "2"
 
 [workspace.dependencies]

@@ -11,7 +11,7 @@ use comfy_table::{modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Table};
 use common::{DaySolver, DualDaySolver, MonoDaySolver};
 use reqwest::blocking::Client;
 
-extern crate generated;
+extern crate imports;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
