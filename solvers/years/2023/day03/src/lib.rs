@@ -25,7 +25,7 @@ struct Number<Metadata> {
 }
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         solve::<bool>(
             input,
             |has_neighbor, neighbor| {
@@ -41,12 +41,12 @@ impl DualDaySolver for Solver {
                     .map(|v| v.value)
                     .sum::<u32>();
 
-                DayResult::new(res)
+                PartResult::new(res)
             },
         )
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         solve::<HashSet<u32>>(
             input,
             |gear_ids, neighbor| {
@@ -73,7 +73,7 @@ impl DualDaySolver for Solver {
                     .map(|v| v.iter().product::<u32>())
                     .sum::<u32>();
 
-                DayResult::new(res)
+                PartResult::new(res)
             },
         )
     }
@@ -82,8 +82,8 @@ impl DualDaySolver for Solver {
 fn solve<NumberMetadata: Default>(
     input: &str,
     inspect_number_neighbor: impl Fn(&mut NumberMetadata, &Element),
-    compute_result: impl Fn(&Vec<Number<NumberMetadata>>) -> DayResult,
-) -> DayResult {
+    compute_result: impl Fn(&Vec<Number<NumberMetadata>>) -> PartResult,
+) -> PartResult {
     // Parse map
     let lines = input.split('\n');
     let mut gear_id = 0;
@@ -140,5 +140,5 @@ fn solve<NumberMetadata: Default>(
         }
     }
 
-    DayResult::new(compute_result(&numbers))
+    PartResult::new(compute_result(&numbers))
 }

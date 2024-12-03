@@ -196,16 +196,16 @@ enum Type {
 }
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         solve(input, Hand::cmp1)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         solve(input, Hand::cmp2)
     }
 }
 
-fn solve(input: &str, cmp: impl Fn(&Hand, &Hand) -> Ordering) -> DayResult {
+fn solve(input: &str, cmp: impl Fn(&Hand, &Hand) -> Ordering) -> PartResult {
     let hands = input.lines().map(|l| {
         let mut words = l.split_whitespace();
         let hand = Hand::from_str(words.next().unwrap()).unwrap();
@@ -219,5 +219,5 @@ fn solve(input: &str, cmp: impl Fn(&Hand, &Hand) -> Ordering) -> DayResult {
         .map(|(i, (_hand, bid))| (i + 1) * bid)
         .sum::<usize>();
 
-    DayResult::new(res)
+    PartResult::new(res)
 }

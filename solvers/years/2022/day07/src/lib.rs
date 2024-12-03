@@ -17,7 +17,7 @@ struct Dir {
 }
 
 impl MonoDaySolver for Solver {
-    fn solve(&self, input: &str) -> (DayResult, DayResult) {
+    fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let dirs = get_dirs(input);
 
         let res1 = dirs
@@ -39,7 +39,7 @@ impl MonoDaySolver for Solver {
             .min()
             .unwrap();
 
-        (DayResult::new(res1), DayResult::new(res2))
+        (PartResult::new(res1), PartResult::new(res2))
     }
 }
 

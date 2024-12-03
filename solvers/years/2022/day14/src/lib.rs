@@ -8,7 +8,7 @@ pub struct Solver;
 const START: (i32, i32) = (500, 0);
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let mut map = parse(input);
 
         let max_y = map.iter().map(|(_x, y)| y).max().unwrap() + 1;
@@ -27,10 +27,10 @@ impl DualDaySolver for Solver {
             sand_units += 1;
         }
 
-        DayResult::new(sand_units)
+        PartResult::new(sand_units)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let mut map = parse(input);
 
         let floor = map.iter().map(|(_x, y)| y).max().unwrap() + 2;
@@ -50,7 +50,7 @@ impl DualDaySolver for Solver {
             }
         }
 
-        DayResult::new(sand_units)
+        PartResult::new(sand_units)
     }
 }
 

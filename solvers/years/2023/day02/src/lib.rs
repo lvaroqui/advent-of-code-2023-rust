@@ -34,7 +34,7 @@ struct Game {
 }
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let lines = input.split('\n');
         let parser = parser();
 
@@ -50,10 +50,10 @@ impl DualDaySolver for Solver {
             })
             .sum::<u32>();
 
-        DayResult::new(res)
+        PartResult::new(res)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let lines = input.split('\n');
         let parser = parser();
 
@@ -68,7 +68,7 @@ impl DualDaySolver for Solver {
             })
             .sum::<u32>();
 
-        DayResult::new(res)
+        PartResult::new(res)
     }
 }
 

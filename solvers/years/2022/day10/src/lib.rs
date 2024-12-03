@@ -9,7 +9,7 @@ enum Op {
 }
 
 impl MonoDaySolver for Solver {
-    fn solve(&self, input: &str) -> (DayResult, DayResult) {
+    fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let _ = input;
         let ops = input.split('\n').map(|l| {
             let mut it = l.split(' ');
@@ -50,6 +50,6 @@ impl MonoDaySolver for Solver {
             };
         }
 
-        (DayResult::new(sum), DayResult::new(screen.trim()))
+        (PartResult::new(sum), PartResult::new(screen.trim()))
     }
 }

@@ -6,9 +6,9 @@ pub mod map;
 pub mod prelude;
 
 #[derive(Default)]
-pub struct DayResult(Option<Box<dyn Display>>);
+pub struct PartResult(Option<Box<dyn Display>>);
 
-impl Display for DayResult {
+impl Display for PartResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.0 {
             Some(r) => write!(f, "{}", r),
@@ -17,13 +17,13 @@ impl Display for DayResult {
     }
 }
 
-impl DayResult {
+impl PartResult {
     pub fn new(val: impl Display) -> Self {
         Self(Some(Box::new(val.to_string())))
     }
 
-    pub fn is_resolved(&self) -> bool {
-        self.0.is_some()
+    pub fn resolved(&self) -> Option<String> {
+        self.0.as_ref().map(|val| val.to_string())
     }
 }
 
@@ -32,14 +32,14 @@ where
     Self: 'static,
 {
     #[allow(unused_variables)]
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let _ = input;
-        DayResult::default()
+        PartResult::default()
     }
 
     #[allow(unused_variables)]
-    fn solve_2(&self, input: &str) -> DayResult {
-        DayResult::default()
+    fn solve_2(&self, input: &str) -> PartResult {
+        PartResult::default()
     }
 
     fn to_day_solver(self) -> DaySolver
@@ -55,8 +55,8 @@ where
     Self: 'static,
 {
     #[allow(unused_variables)]
-    fn solve(&self, input: &str) -> (DayResult, DayResult) {
-        (DayResult::default(), DayResult::default())
+    fn solve(&self, input: &str) -> (PartResult, PartResult) {
+        (PartResult::default(), PartResult::default())
     }
 
     fn to_day_solver(self) -> DaySolver

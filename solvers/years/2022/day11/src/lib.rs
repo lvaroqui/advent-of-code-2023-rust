@@ -15,16 +15,16 @@ struct Monkey {
 }
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         solve(input, true)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         solve(input, false)
     }
 }
 
-fn solve(input: &str, part1: bool) -> DayResult {
+fn solve(input: &str, part1: bool) -> PartResult {
     let mut monkeys = parse(input);
 
     let n = monkeys
@@ -55,7 +55,7 @@ fn solve(input: &str, part1: bool) -> DayResult {
         }
     }
     monkeys.sort_by_key(|m| m.borrow().inspection_count);
-    DayResult::new(
+    PartResult::new(
         monkeys
             .iter()
             .map(|m| m.borrow().inspection_count)

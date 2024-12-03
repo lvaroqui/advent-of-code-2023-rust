@@ -68,7 +68,7 @@ struct Input {
 }
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let input = parser().parse(input).unwrap();
 
         let mut elements = input.individual_seeds.clone();
@@ -79,10 +79,10 @@ impl DualDaySolver for Solver {
             }
         }
 
-        DayResult::new(elements.iter().min().unwrap())
+        PartResult::new(elements.iter().min().unwrap())
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let input = parser().parse(input).unwrap();
 
         let mut ranges = input.range_seeds.clone();
@@ -91,7 +91,7 @@ impl DualDaySolver for Solver {
             ranges = mapping.map_range(ranges);
         }
 
-        DayResult::new(match ranges.iter().next().unwrap() {
+        PartResult::new(match ranges.iter().next().unwrap() {
             RangeSetRange::Range(r) => r.start,
             RangeSetRange::RangeFrom(_) => unreachable!(),
         })

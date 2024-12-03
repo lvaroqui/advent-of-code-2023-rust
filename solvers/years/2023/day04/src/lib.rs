@@ -23,13 +23,13 @@ impl Card {
 }
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let cards = parser().parse(input).unwrap();
         let res = cards.iter().map(Card::points).sum::<u32>();
-        DayResult::new(res)
+        PartResult::new(res)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let cards = parser().parse(input).unwrap();
         let mut card_counts = vec![1; cards.len()];
 
@@ -39,7 +39,7 @@ impl DualDaySolver for Solver {
             }
         }
 
-        DayResult::new(card_counts.iter().sum::<usize>())
+        PartResult::new(card_counts.iter().sum::<usize>())
     }
 }
 

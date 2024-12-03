@@ -5,7 +5,7 @@ register_solver!(2022, 3, Solver);
 pub struct Solver;
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let res = input
             .split('\n')
             .map(|l| {
@@ -15,10 +15,10 @@ impl DualDaySolver for Solver {
             })
             .sum::<u64>();
 
-        DayResult::new(res)
+        PartResult::new(res)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let res = input
             .split('\n')
             .map(to_bitset)
@@ -26,7 +26,7 @@ impl DualDaySolver for Solver {
             .map(|(a, ref b, ref c)| Ones::new(a & b & c).next().unwrap())
             .sum::<u64>();
 
-        DayResult::new(res)
+        PartResult::new(res)
     }
 }
 

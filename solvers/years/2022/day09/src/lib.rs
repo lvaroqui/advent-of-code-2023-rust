@@ -6,7 +6,7 @@ use common::prelude::*;
 pub struct Solver;
 
 impl MonoDaySolver for Solver {
-    fn solve(&self, input: &str) -> (DayResult, DayResult) {
+    fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let mut rope = [(0, 0); 10];
         let mut visited_first = HashSet::new();
         let mut visited_second = HashSet::new();
@@ -51,8 +51,8 @@ impl MonoDaySolver for Solver {
         }
 
         (
-            DayResult::new(visited_first.len()),
-            DayResult::new(visited_second.len()),
+            PartResult::new(visited_first.len()),
+            PartResult::new(visited_second.len()),
         )
     }
 }

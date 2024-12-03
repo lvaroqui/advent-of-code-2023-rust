@@ -21,7 +21,7 @@ struct Input {
 }
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         solve(
             input,
             |name| name == "AAA", //
@@ -29,7 +29,7 @@ impl DualDaySolver for Solver {
         )
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         solve(
             input,
             |name| name.ends_with('A'),
@@ -42,7 +42,7 @@ fn solve(
     input: &str,
     start_condition: impl Fn(&str) -> bool,
     end_condition: impl Fn(&str) -> bool,
-) -> DayResult {
+) -> PartResult {
     let input = parser().parse(input).unwrap();
     let starts = input
         .nodes
@@ -70,7 +70,7 @@ fn solve(
         counts.push(step_count);
     }
 
-    DayResult::new(counts.into_iter().reduce(num::integer::lcm).unwrap())
+    PartResult::new(counts.into_iter().reduce(num::integer::lcm).unwrap())
 }
 
 fn parser() -> impl Parser<char, Input, Error = Simple<char>> {

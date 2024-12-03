@@ -4,7 +4,7 @@ register_solver!(2022, 13, Solver);
 pub struct Solver;
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let res = input
             .split("\n\n")
             .map(|l| {
@@ -16,10 +16,10 @@ impl DualDaySolver for Solver {
             .map(|(i, _)| i + 1)
             .sum::<usize>();
 
-        DayResult::new(res)
+        PartResult::new(res)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let mut res: Vec<_> = input.split_whitespace().map(parse).collect();
         let divider1 = Packet::List(vec![Packet::List(vec![Packet::Integer(2)])]);
         let divider2 = Packet::List(vec![Packet::List(vec![Packet::Integer(6)])]);
@@ -31,7 +31,7 @@ impl DualDaySolver for Solver {
         let pos1 = res.iter().position(|p| *p == divider1).unwrap() + 1;
         let pos2 = res.iter().position(|p| *p == divider2).unwrap() + 1;
 
-        DayResult::new(pos1 * pos2)
+        PartResult::new(pos1 * pos2)
     }
 }
 

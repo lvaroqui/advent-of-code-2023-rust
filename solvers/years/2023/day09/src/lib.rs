@@ -8,11 +8,11 @@ register_solver!(2023, 9, Solver);
 pub struct Solver;
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         solve(input, VecDeque::back, VecDeque::push_back, i32::add)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         solve(input, VecDeque::front, VecDeque::push_front, i32::sub)
     }
 }
@@ -22,7 +22,7 @@ fn solve(
     value_getter: impl Fn(&VecDeque<i32>) -> Option<&i32>,
     value_pusher: impl Fn(&mut VecDeque<i32>, i32),
     op: impl Fn(i32, i32) -> i32,
-) -> DayResult {
+) -> PartResult {
     let series = input
         .lines()
         .map(|line| {
@@ -59,5 +59,5 @@ fn solve(
         sum += value_getter(stack.last().unwrap()).unwrap();
     }
 
-    DayResult::new(sum)
+    PartResult::new(sum)
 }

@@ -46,16 +46,16 @@ impl Run {
 }
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let runs = parser_1().parse(input).unwrap();
         let res = runs.iter().map(Run::number_of_way_to_win).product::<u64>();
 
-        DayResult::new(res)
+        PartResult::new(res)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let run = parser_2().parse(input).unwrap();
-        DayResult::new(run.number_of_way_to_win())
+        PartResult::new(run.number_of_way_to_win())
     }
 }
 

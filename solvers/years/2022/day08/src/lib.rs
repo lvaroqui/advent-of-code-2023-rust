@@ -8,7 +8,7 @@ pub struct Solver;
 type Map = Vec<Vec<u32>>;
 
 impl MonoDaySolver for Solver {
-    fn solve(&self, input: &str) -> (DayResult, DayResult) {
+    fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let map: Map = input
             .split('\n')
             .map(|l| l.chars().map(|c| c.to_digit(10).unwrap()).collect())
@@ -30,8 +30,8 @@ impl MonoDaySolver for Solver {
             .unwrap();
 
         (
-            DayResult::new(visible_trees),
-            DayResult::new(max_scenic_score),
+            PartResult::new(visible_trees),
+            PartResult::new(max_scenic_score),
         )
     }
 }

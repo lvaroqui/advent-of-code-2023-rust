@@ -4,7 +4,7 @@ register_solver!(2022, 2, Solver);
 pub struct Solver;
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let res = input
             .lines()
             .map(|l| {
@@ -16,10 +16,10 @@ impl DualDaySolver for Solver {
             })
             .map(|(other, me)| me.value() + me.fight(&other).score())
             .sum::<u32>();
-        DayResult::new(res)
+        PartResult::new(res)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let res = input
             .lines()
             .map(|l| {
@@ -38,7 +38,7 @@ impl DualDaySolver for Solver {
                 unreachable!();
             })
             .sum::<u32>();
-        DayResult::new(res)
+        PartResult::new(res)
     }
 }
 

@@ -7,7 +7,7 @@ pub struct Solver;
 type Map = Vec<Vec<u8>>;
 
 impl MonoDaySolver for Solver {
-    fn solve(&self, input: &str) -> (DayResult, DayResult) {
+    fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let mut start = None;
         let mut end = None;
         let map: Map = input
@@ -63,7 +63,7 @@ impl MonoDaySolver for Solver {
             .min()
             .unwrap();
 
-        (DayResult::new(res1), DayResult::new(res2))
+        (PartResult::new(res1), PartResult::new(res2))
     }
 }
 

@@ -5,7 +5,7 @@ register_solver!(2024, 1, Solver);
 pub struct Solver;
 
 impl common::MonoDaySolver for Solver {
-    fn solve(&self, input: &str) -> (DayResult, DayResult) {
+    fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let (mut list_a, mut list_b): (Vec<_>, Vec<_>) = input
             .lines()
             .map(|l| {
@@ -31,6 +31,6 @@ impl common::MonoDaySolver for Solver {
             .map(|a| a * list_b.iter().filter(|b| **b == *a).count() as i32)
             .sum::<i32>();
 
-        (DayResult::new(res1), DayResult::new(res2))
+        (PartResult::new(res1), PartResult::new(res2))
     }
 }

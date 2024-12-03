@@ -38,13 +38,13 @@ impl From<char> for Element {
 }
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let map = parse(input);
 
-        DayResult::new(pipe_iter(&map, false).count() / 2)
+        PartResult::new(pipe_iter(&map, false).count() / 2)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let map = parse(input);
 
         let mut turn_count = 0;
@@ -109,7 +109,7 @@ impl DualDaySolver for Solver {
             inner_parts.extend(to_add);
         }
 
-        DayResult::new(inner_parts.len())
+        PartResult::new(inner_parts.len())
     }
 }
 

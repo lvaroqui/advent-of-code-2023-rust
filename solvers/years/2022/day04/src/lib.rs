@@ -6,7 +6,7 @@ use common::prelude::*;
 pub struct Solver;
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         let res = get_ranges(input)
             .filter(|(a, b)| {
                 (a.contains(b.start()) && a.contains(b.end()))
@@ -14,10 +14,10 @@ impl DualDaySolver for Solver {
             })
             .count();
 
-        DayResult::new(res)
+        PartResult::new(res)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         let res = get_ranges(input)
             .filter(|(a, b)| {
                 a.contains(b.start())
@@ -27,7 +27,7 @@ impl DualDaySolver for Solver {
             })
             .count();
 
-        DayResult::new(res)
+        PartResult::new(res)
     }
 }
 

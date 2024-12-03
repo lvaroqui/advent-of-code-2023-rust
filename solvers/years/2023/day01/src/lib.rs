@@ -17,11 +17,11 @@ const MAPPING: [(&str, u32); 9] = [
 ];
 
 impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> DayResult {
+    fn solve_1(&self, input: &str) -> PartResult {
         solve(input, first_char_to_digit)
     }
 
-    fn solve_2(&self, input: &str) -> DayResult {
+    fn solve_2(&self, input: &str) -> PartResult {
         solve(input, |s| {
             if let Some(digit) = first_char_to_digit(s) {
                 return Some(digit);
@@ -46,7 +46,7 @@ fn first_char_to_digit(s: &str) -> Option<u32> {
     }
 }
 
-fn solve(input: &str, filter: impl Fn(&str) -> Option<u32>) -> DayResult {
+fn solve(input: &str, filter: impl Fn(&str) -> Option<u32>) -> PartResult {
     let res: u32 = input
         .split_whitespace()
         .map(|line| {
@@ -75,5 +75,5 @@ fn solve(input: &str, filter: impl Fn(&str) -> Option<u32>) -> DayResult {
         })
         .sum();
 
-    DayResult::new(res)
+    PartResult::new(res)
 }
