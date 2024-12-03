@@ -4,7 +4,7 @@ register_solver!(2024, 1, Solver);
 
 pub struct Solver;
 
-impl common::MonoDaySolver for Solver {
+impl MonoDaySolver for Solver {
     fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let (mut list_a, mut list_b): (Vec<_>, Vec<_>) = input
             .lines()

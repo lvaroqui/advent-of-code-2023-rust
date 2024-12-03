@@ -4,7 +4,6 @@ My solutions to (some) days of [Advent of Code](https://adventofcode.com/) in [R
 
 # TODOs
 
-- check if day exists, if not propose to create it
 - import 2021
 - remove old repos from github and rename this one
 - fill README

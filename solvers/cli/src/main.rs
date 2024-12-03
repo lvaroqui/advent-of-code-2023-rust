@@ -5,7 +5,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use anyhow::{bail, Context};
+use anyhow::Context;
 use clap::Parser;
 use comfy_table::{modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Table};
 use common::PartResult;
@@ -13,6 +13,9 @@ use common::PartResult;
 use common::{DaySolver, DualDaySolver, MonoDaySolver};
 use maybe_shared::MaybeShared;
 use reqwest::blocking::Client;
+
+mod maybe_shared;
+mod scaffold_solver;
 
 extern crate imports;
 
@@ -39,11 +42,8 @@ fn main() -> anyhow::Result<()> {
     let solvers = match args.day {
         Some(day) => {
             let Some(solver) = solvers.get(args.year, day) else {
-                bail!(
-                    "Solver for year {} day {} is not implemented",
-                    args.year,
-                    day
-                );
+                scaffold_solver::scaffold_solver(args.year, day)?;
+                return Ok(());
             };
             vec![(day, solver)]
         }
@@ -95,8 +95,6 @@ fn validated_to_string(validated: Option<bool>) -> impl std::fmt::Display {
     }
 }
 
-mod maybe_shared;
-
 fn solve(year: u16, day: u8, solver: DaySolver, test: bool) -> anyhow::Result<DayResult> {
     let runner = if test {
         get_test_runner(year, day)?
@@ -104,6 +102,7 @@ fn solve(year: u16, day: u8, solver: DaySolver, test: bool) -> anyhow::Result<Da
         get_input_runner(year, day)?
     };
     let inputs = runner.get_inputs();
+    let inputs = inputs.map(|s| s.trim_end());
     let (part_1, part_2, stats) = match solver {
         DaySolver::Mono(s) => match inputs {
             MaybeShared::Shared(input) => {
