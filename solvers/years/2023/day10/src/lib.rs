@@ -66,26 +66,26 @@ impl DualDaySolver for Solver {
         for p in iter {
             use Element as E;
             let to_check = match p.element {
-                E::Vertical if p.from_dir == Vec2::UP => vec![Vec2::RIGHT],
-                E::Vertical if p.from_dir == Vec2::DOWN => vec![Vec2::LEFT],
-                E::Horizontal if p.from_dir == Vec2::LEFT => vec![Vec2::UP],
-                E::Horizontal if p.from_dir == Vec2::RIGHT => vec![Vec2::DOWN],
-                E::BottomLeft if p.from_dir == Vec2::LEFT => vec![],
-                E::BottomLeft if p.from_dir == Vec2::DOWN => {
-                    vec![Vec2::DOWN, Vec2::LEFT]
+                E::Vertical if p.from_dir == Vec2::NORTH => vec![Vec2::EAST],
+                E::Vertical if p.from_dir == Vec2::SOUTH => vec![Vec2::WEST],
+                E::Horizontal if p.from_dir == Vec2::WEST => vec![Vec2::NORTH],
+                E::Horizontal if p.from_dir == Vec2::EAST => vec![Vec2::SOUTH],
+                E::BottomLeft if p.from_dir == Vec2::WEST => vec![],
+                E::BottomLeft if p.from_dir == Vec2::SOUTH => {
+                    vec![Vec2::SOUTH, Vec2::WEST]
                 }
-                E::TopRight if p.from_dir == Vec2::RIGHT => vec![],
-                E::TopRight if p.from_dir == Vec2::UP => {
-                    vec![Vec2::UP, Vec2::RIGHT]
+                E::TopRight if p.from_dir == Vec2::EAST => vec![],
+                E::TopRight if p.from_dir == Vec2::NORTH => {
+                    vec![Vec2::NORTH, Vec2::EAST]
                 }
-                E::TopLeft if p.from_dir == Vec2::LEFT => {
-                    vec![Vec2::UP, Vec2::LEFT]
+                E::TopLeft if p.from_dir == Vec2::WEST => {
+                    vec![Vec2::NORTH, Vec2::WEST]
                 }
-                E::TopLeft if p.from_dir == Vec2::UP => vec![],
-                E::BottomRight if p.from_dir == Vec2::RIGHT => {
-                    vec![Vec2::DOWN, Vec2::RIGHT]
+                E::TopLeft if p.from_dir == Vec2::NORTH => vec![],
+                E::BottomRight if p.from_dir == Vec2::EAST => {
+                    vec![Vec2::SOUTH, Vec2::EAST]
                 }
-                E::BottomRight if p.from_dir == Vec2::DOWN => vec![],
+                E::BottomRight if p.from_dir == Vec2::SOUTH => vec![],
                 _ => unreachable!("{:?}", p),
             };
 
@@ -146,10 +146,10 @@ fn pipe_iter(map: &Map<Element>, reverse: bool) -> impl Iterator<Item = PipePart
         .unwrap();
 
     let directions = [
-        (Vec2::LEFT, &[E::Horizontal, E::BottomLeft, E::TopLeft]),
-        (Vec2::RIGHT, &[E::Horizontal, E::BottomRight, E::TopRight]),
-        (Vec2::UP, &[E::Vertical, E::TopLeft, E::TopRight]),
-        (Vec2::DOWN, &[E::Vertical, E::BottomLeft, E::BottomRight]),
+        (Vec2::WEST, &[E::Horizontal, E::BottomLeft, E::TopLeft]),
+        (Vec2::EAST, &[E::Horizontal, E::BottomRight, E::TopRight]),
+        (Vec2::NORTH, &[E::Vertical, E::TopLeft, E::TopRight]),
+        (Vec2::SOUTH, &[E::Vertical, E::BottomLeft, E::BottomRight]),
     ]
     .into_iter()
     .map(|(direction, valid)| (direction, start + direction, valid))
@@ -164,12 +164,12 @@ fn pipe_iter(map: &Map<Element>, reverse: bool) -> impl Iterator<Item = PipePart
     assert_eq!(directions.len(), 2);
 
     let start_element = match (directions[0].0, directions[1].0) {
-        (Vec2::LEFT, Vec2::RIGHT) | (Vec2::RIGHT, Vec2::LEFT) => Element::Horizontal,
-        (Vec2::DOWN, Vec2::UP) | (Vec2::UP, Vec2::DOWN) => Element::Vertical,
-        (Vec2::DOWN, Vec2::RIGHT) | (Vec2::RIGHT, Vec2::DOWN) => Element::TopLeft,
-        (Vec2::DOWN, Vec2::LEFT) | (Vec2::LEFT, Vec2::DOWN) => Element::TopRight,
-        (Vec2::UP, Vec2::RIGHT) | (Vec2::RIGHT, Vec2::UP) => Element::BottomLeft,
-        (Vec2::UP, Vec2::LEFT) | (Vec2::LEFT, Vec2::UP) => Element::BottomRight,
+        (Vec2::WEST, Vec2::EAST) | (Vec2::EAST, Vec2::WEST) => Element::Horizontal,
+        (Vec2::SOUTH, Vec2::NORTH) | (Vec2::NORTH, Vec2::SOUTH) => Element::Vertical,
+        (Vec2::SOUTH, Vec2::EAST) | (Vec2::EAST, Vec2::SOUTH) => Element::TopLeft,
+        (Vec2::SOUTH, Vec2::WEST) | (Vec2::WEST, Vec2::SOUTH) => Element::TopRight,
+        (Vec2::NORTH, Vec2::EAST) | (Vec2::EAST, Vec2::NORTH) => Element::BottomLeft,
+        (Vec2::NORTH, Vec2::WEST) | (Vec2::WEST, Vec2::NORTH) => Element::BottomRight,
         other => unreachable!("{:?}", other),
     };
 
@@ -194,14 +194,14 @@ fn pipe_iter(map: &Map<Element>, reverse: bool) -> impl Iterator<Item = PipePart
     .chain(std::iter::from_fn(move || {
         let (new_from_dir, turn_dir) = match map[to] {
             E::Vertical | E::Horizontal => (from_dir, None),
-            E::BottomLeft if from_dir == Vec2::LEFT => (Vec2::UP, Some(Direction::Right)),
-            E::BottomLeft if from_dir == Vec2::DOWN => (Vec2::RIGHT, Some(Direction::Left)),
-            E::TopRight if from_dir == Vec2::RIGHT => (Vec2::DOWN, Some(Direction::Right)),
-            E::TopRight if from_dir == Vec2::UP => (Vec2::LEFT, Some(Direction::Left)),
-            E::TopLeft if from_dir == Vec2::LEFT => (Vec2::DOWN, Some(Direction::Left)),
-            E::TopLeft if from_dir == Vec2::UP => (Vec2::RIGHT, Some(Direction::Right)),
-            E::BottomRight if from_dir == Vec2::RIGHT => (Vec2::UP, Some(Direction::Left)),
-            E::BottomRight if from_dir == Vec2::DOWN => (Vec2::LEFT, Some(Direction::Right)),
+            E::BottomLeft if from_dir == Vec2::WEST => (Vec2::NORTH, Some(Direction::Right)),
+            E::BottomLeft if from_dir == Vec2::SOUTH => (Vec2::EAST, Some(Direction::Left)),
+            E::TopRight if from_dir == Vec2::EAST => (Vec2::SOUTH, Some(Direction::Right)),
+            E::TopRight if from_dir == Vec2::NORTH => (Vec2::WEST, Some(Direction::Left)),
+            E::TopLeft if from_dir == Vec2::WEST => (Vec2::SOUTH, Some(Direction::Left)),
+            E::TopLeft if from_dir == Vec2::NORTH => (Vec2::EAST, Some(Direction::Right)),
+            E::BottomRight if from_dir == Vec2::EAST => (Vec2::NORTH, Some(Direction::Left)),
+            E::BottomRight if from_dir == Vec2::SOUTH => (Vec2::WEST, Some(Direction::Right)),
             E::Start => return None,
             E::Ground => unreachable!(),
             other => unreachable!("{:?} from dir {:?} at {:?}", other, from_dir, to),

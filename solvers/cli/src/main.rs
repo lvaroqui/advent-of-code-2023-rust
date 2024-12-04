@@ -54,24 +54,31 @@ fn main() -> anyhow::Result<()> {
         .into_iter()
         .map(|(day, solver)| solve(args.year, day, solver, args.test).map(|res| (day, res)))
         .collect::<Result<Vec<_>, _>>()?;
+    let total_time = results
+        .iter()
+        .map(|(_, r)| match r.stats {
+            MaybeShared::Shared(a) => a,
+            MaybeShared::Separate(a, b) => a + b,
+        })
+        .sum::<Duration>();
 
     let mut table = Table::new();
     table
         .load_preset(UTF8_FULL)
         .apply_modifier(UTF8_ROUND_CORNERS)
         .set_header(vec!["Day", "First Part", "Second Part", "Statistics"])
-        .add_rows(results.into_iter().map(|(day, result)| {
+        .add_rows(results.iter().map(|(day, result)| {
             [
                 day.to_string(),
                 format!(
                     "{}{}",
+                    validated_to_string(result.part_1_validated),
                     result.part_1,
-                    validated_to_string(result.part_1_validated)
                 ),
                 format!(
                     "{}{}",
+                    validated_to_string(result.part_2_validated),
                     result.part_2,
-                    validated_to_string(result.part_2_validated)
                 ),
                 match result.stats {
                     MaybeShared::Shared(stats) => format!("{:?}", stats),
@@ -80,7 +87,11 @@ fn main() -> anyhow::Result<()> {
                     }
                 },
             ]
-        }));
+        }))
+        .add_row_if(
+            |_, _| results.len() > 1,
+            vec!["Total", "-", "-", &format!("{:?}", total_time)],
+        );
 
     println!("{table}");
 
@@ -89,8 +100,8 @@ fn main() -> anyhow::Result<()> {
 
 fn validated_to_string(validated: Option<bool>) -> impl std::fmt::Display {
     match validated {
-        Some(true) => " ✅",
-        Some(false) => " ❌",
+        Some(true) => "✅ ",
+        Some(false) => "❌ ",
         None => "",
     }
 }

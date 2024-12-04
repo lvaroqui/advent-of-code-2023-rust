@@ -4,9 +4,7 @@ impl<T> Map<T> {
     pub fn new(map: Vec<Vec<T>>) -> Self {
         Map(map)
     }
-}
 
-impl<T> Map<T> {
     pub fn iter(&self) -> impl Iterator<Item = (Vec2, &T)> {
         self.0.iter().enumerate().flat_map(|(y, row)| {
             row.iter().enumerate().map(move |(x, val)| {
@@ -18,6 +16,21 @@ impl<T> Map<T> {
                     val,
                 )
             })
+        })
+    }
+
+    pub fn iter_from_point(
+        &self,
+        start: Vec2,
+        direction: Vec2,
+    ) -> impl Iterator<Item = (Vec2, &T)> {
+        let mut current = start;
+        std::iter::from_fn(move || {
+            let value = self.get(current).map(|v| (current, v));
+
+            current = current + direction;
+
+            value
         })
     }
 
@@ -83,10 +96,27 @@ pub fn vec2(x: impl Into<i64>, y: impl Into<i64>) -> Vec2 {
 }
 
 impl Vec2 {
-    pub const LEFT: Self = Vec2 { x: -1, y: 0 };
-    pub const RIGHT: Self = Vec2 { x: 1, y: 0 };
-    pub const UP: Self = Vec2 { x: 0, y: -1 };
-    pub const DOWN: Self = Vec2 { x: 0, y: 1 };
+    pub const EAST: Self = Vec2 { x: 1, y: 0 };
+    pub const SOUTH_EAST: Self = Vec2 { x: 1, y: 1 };
+    pub const SOUTH: Self = Vec2 { x: 0, y: 1 };
+    pub const SOUTH_WEST: Self = Vec2 { x: -1, y: 1 };
+    pub const WEST: Self = Vec2 { x: -1, y: 0 };
+    pub const NORTH_WEST: Self = Vec2 { x: -1, y: -1 };
+    pub const NORTH: Self = Vec2 { x: 0, y: -1 };
+    pub const NORTH_EAST: Self = Vec2 { x: 1, y: -1 };
+
+    pub fn directions() -> [Vec2; 8] {
+        [
+            Vec2::EAST,
+            Vec2::SOUTH_EAST,
+            Vec2::SOUTH,
+            Vec2::SOUTH_WEST,
+            Vec2::WEST,
+            Vec2::NORTH_WEST,
+            Vec2::NORTH,
+            Vec2::NORTH_EAST,
+        ]
+    }
 }
 
 impl std::ops::Add for Vec2 {

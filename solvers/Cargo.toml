@@ -9,6 +9,7 @@ chumsky = "0.9.3"
 strum = "0.26.3"
 strum_macros = "0.26.4"
 num = "0.4.1"
+enum-iterator = "2.1"
 common = { path = "common" }
 
 [profile.release]
