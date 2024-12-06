@@ -1,3 +1,4 @@
+#[derive(Debug, Clone)]
 pub struct Map<T>(Vec<Vec<T>>);
 
 impl<T> Map<T> {
@@ -69,6 +70,10 @@ impl<T> Map<T> {
         self.0.get(pos.y as usize)?.get(pos.x as usize)
     }
 
+    pub fn get_mut(&mut self, pos: Vec2) -> Option<&mut T> {
+        self.0.get_mut(pos.y as usize)?.get_mut(pos.x as usize)
+    }
+
     pub fn inner(&self) -> &Vec<Vec<T>> {
         &self.0
     }
@@ -116,6 +121,14 @@ impl Vec2 {
             Vec2::NORTH,
             Vec2::NORTH_EAST,
         ]
+    }
+
+    pub fn rotate(self, angle: f32) -> Self {
+        let x = self.x as f32;
+        let y = self.y as f32;
+        let x_rotated = (x * angle.cos()) - (y * angle.sin());
+        let y_rotated = (y * angle.cos()) + (x * angle.sin());
+        vec2(x_rotated as i64, y_rotated as i64)
     }
 }
 
