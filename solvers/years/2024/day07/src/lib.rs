@@ -11,6 +11,35 @@ impl DualDaySolver for Solver {
         let equations = parser().parse(input).unwrap();
 
         let res = equations
+            .iter()
+            .filter(|e| e.check(&[Operator::Add, Operator::Multiply]))
+            .map(|e| e.result)
+            .sum::<i64>();
+
+        PartResult::new(res)
+    }
+
+    fn solve_2(&self, input: &str) -> PartResult {
+        let equations = parser().parse(input).unwrap();
+
+        let res = equations
+            .iter()
+            .filter(|e| e.check(&[Operator::Add, Operator::Multiply, Operator::Concat]))
+            .map(|e| e.result)
+            .sum::<i64>();
+
+        PartResult::new(res)
+    }
+}
+
+// register_solver!(2024, 7, SolverIterativeBruteForce);
+pub struct SolverIterativeBruteForce;
+
+impl DualDaySolver for SolverIterativeBruteForce {
+    fn solve_1(&self, input: &str) -> PartResult {
+        let equations = parser().parse(input).unwrap();
+
+        let res = equations
             .par_iter()
             .filter(|e| {
                 generate_all_variants_iter([Operator::Add, Operator::Multiply], e.numbers.len() - 1)
@@ -42,7 +71,7 @@ impl DualDaySolver for Solver {
 }
 
 fn apply(numbers: &[i64], operators: &[Operator]) -> i64 {
-    assert!(numbers.len() == operators.len() + 1);
+    debug_assert!(numbers.len() == operators.len() + 1);
     let mut ops = operators.iter();
 
     numbers
@@ -74,12 +103,13 @@ fn generate_all_variants_iter<const N: usize>(
     })
 }
 
-fn num_digits_in_base(n: i64, base: u64) -> u32 {
+fn num_digits_in_base_10(n: i64) -> u32 {
     if n == 0 {
-        return 1; // Special case: 0 has exactly 1 digit in any base.
+        // Special case: 0 has exactly 1 digit in any base.
+        1
+    } else {
+        n.ilog10() + 1
     }
-    // Compute the number of digits using the formula: floor(log_b(n)) + 1
-    (n as f64).log(base as f64).floor() as u32 + 1
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -93,7 +123,22 @@ impl Operator {
         match self {
             Operator::Add => a + b,
             Operator::Multiply => a * b,
-            Operator::Concat => a * 10_i64.pow(num_digits_in_base(b, 10)) as i64 + b,
+            Operator::Concat => a * 10_i64.pow(num_digits_in_base_10(b)) as i64 + b,
+        }
+    }
+
+    fn try_unapply(&self, from: i64, number: i64) -> Option<i64> {
+        match self {
+            Operator::Add => (from > number).then(|| from - number),
+            Operator::Multiply => (from % number == 0).then(|| from / number),
+            Operator::Concat => {
+                let ten_power = 10_i64.pow(num_digits_in_base_10(number));
+                if (from - number) % ten_power == 0 {
+                    Some(from / ten_power)
+                } else {
+                    None
+                }
+            }
         }
     }
 }
@@ -102,6 +147,35 @@ impl Operator {
 struct Equation {
     result: i64,
     numbers: Vec<i64>,
+}
+
+impl Equation {
+    fn check(&self, operators: &[Operator]) -> bool {
+        fn check_impl(
+            operators: &[Operator],
+            current: i64,
+            numbers: &[i64],
+            operator: Operator,
+        ) -> bool {
+            if numbers.len() == 1 {
+                return current == numbers[0];
+            }
+
+            let (last, numbers) = numbers.split_last().unwrap();
+
+            let Some(current) = operator.try_unapply(current, *last) else {
+                return false;
+            };
+
+            operators
+                .iter()
+                .any(|op| check_impl(operators, current, numbers, *op))
+        }
+
+        operators
+            .iter()
+            .any(|op| check_impl(operators, self.result, &self.numbers, *op))
+    }
 }
 
 fn parser() -> impl Parser<char, Vec<Equation>, Error = Simple<char>> {
