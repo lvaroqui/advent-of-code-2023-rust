@@ -42,11 +42,11 @@ where
         PartResult::default()
     }
 
-    fn to_day_solver(self) -> DaySolver
+    fn to_day_solver_impl(self) -> DaySolverImpl
     where
         Self: Sized,
     {
-        DaySolver::Dual(Box::new(self))
+        DaySolverImpl::Dual(Box::new(self))
     }
 }
 
@@ -59,15 +59,30 @@ where
         (PartResult::default(), PartResult::default())
     }
 
-    fn to_day_solver(self) -> DaySolver
+    fn to_day_solver_impl(self) -> DaySolverImpl
     where
         Self: Sized,
     {
-        DaySolver::Mono(Box::new(self))
+        DaySolverImpl::Mono(Box::new(self))
     }
 }
 
-pub enum DaySolver {
+pub struct DaySolver {
+    pub year: u16,
+    pub day: u8,
+    pub label: Option<&'static str>,
+    pub implementation: DaySolverImpl,
+}
+
+pub enum DaySolverImpl {
     Mono(Box<dyn MonoDaySolver>),
     Dual(Box<dyn DualDaySolver>),
+}
+
+pub struct UnimplementedSolver;
+
+impl MonoDaySolver for UnimplementedSolver {
+    fn solve(&self, _input: &str) -> (PartResult, PartResult) {
+        (PartResult::default(), PartResult::default())
+    }
 }

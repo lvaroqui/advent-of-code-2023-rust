@@ -32,7 +32,7 @@ impl DualDaySolver for Solver {
     }
 }
 
-// register_solver!(2024, 7, SolverIterativeBruteForce);
+register_solver!(2024, 7, SolverIterativeBruteForce, "iterative");
 pub struct SolverIterativeBruteForce;
 
 impl DualDaySolver for SolverIterativeBruteForce {

@@ -5,12 +5,12 @@ use std::{
     time::{Duration, Instant},
 };
 
-use anyhow::Context;
+use anyhow::{bail, Context};
 use clap::Parser;
 use comfy_table::{modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL, Table};
-use common::PartResult;
+use common::{inventory::LabelQuery, DaySolver, PartResult, UnimplementedSolver};
 #[allow(unused_imports)]
-use common::{DaySolver, DualDaySolver, MonoDaySolver};
+use common::{DaySolverImpl, DualDaySolver, MonoDaySolver};
 use maybe_shared::MaybeShared;
 use reqwest::blocking::Client;
 
@@ -22,16 +22,19 @@ extern crate imports;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// Year to solve
-    #[arg(value_parser = clap::value_parser!(u16))]
-    year: u16,
-
-    /// Day to solve
-    #[arg(value_parser = clap::value_parser!(u8).range(0..=24))]
-    day: Option<u8>,
+    #[arg(short, long, num_args = 1.., value_delimiter = ',')]
+    label: Option<Vec<String>>,
 
     #[arg(short, long)]
     test: bool,
+
+    /// Year to solve
+    #[arg(short, long, value_parser = clap::value_parser!(u16), num_args = 1.., value_delimiter = ',')]
+    year: Option<Vec<u16>>,
+
+    /// Day to solve
+    #[arg(short, long, value_parser = clap::value_parser!(u8).range(0..=24), num_args = 1.., value_delimiter = ',')]
+    day: Option<Vec<u8>>,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -39,24 +42,44 @@ fn main() -> anyhow::Result<()> {
 
     let solvers = common::inventory::Solvers::new().map_err(anyhow::Error::msg)?;
 
-    let solvers = match args.day {
-        Some(day) => {
-            let Some(solver) = solvers.get(args.year, day) else {
-                scaffold_solver::scaffold_solver(args.year, day)?;
-                return Ok(());
-            };
-            vec![(day, solver)]
-        }
-        None => solvers.year(args.year).collect::<Vec<_>>(),
+    let labels = args
+        .label
+        .as_ref()
+        .map(|v| v.iter().map(|l| l.as_str()).collect::<Vec<_>>());
+    let label_query = match labels.as_deref() {
+        Some(s) if s.contains(&"all") => LabelQuery::All,
+        Some(s) => LabelQuery::Labeled(s),
+        None => LabelQuery::DefaultOnly,
     };
+
+    let mut solvers: Vec<_> = solvers
+        .query(args.year.as_deref(), args.day.as_deref(), label_query)
+        .collect();
+
+    if solvers.is_empty() {
+        if let (Some([year]), Some([day]), None) =
+            (args.year.as_deref(), args.day.as_deref(), args.label)
+        {
+            scaffold_solver::scaffold_solver(*year, *day)?;
+            solvers.push(DaySolver {
+                year: *year,
+                day: *day,
+                label: None,
+                implementation: UnimplementedSolver.to_day_solver_impl(),
+            });
+        } else {
+            bail!("No matching solver found!")
+        }
+    }
 
     let results = solvers
         .into_iter()
-        .map(|(day, solver)| solve(args.year, day, solver, args.test).map(|res| (day, res)))
+        .map(|solver| solve(&solver, args.test))
         .collect::<Result<Vec<_>, _>>()?;
+
     let total_time = results
         .iter()
-        .map(|(_, r)| match r.stats {
+        .map(|r| match r.stats {
             MaybeShared::Shared(a) => a,
             MaybeShared::Separate(a, b) => a + b,
         })
@@ -66,10 +89,22 @@ fn main() -> anyhow::Result<()> {
     table
         .load_preset(UTF8_FULL)
         .apply_modifier(UTF8_ROUND_CORNERS)
-        .set_header(vec!["Day", "First Part", "Second Part", "Statistics"])
-        .add_rows(results.iter().map(|(day, result)| {
+        .set_header(vec![
+            "Year",
+            "Day",
+            "Label",
+            "First Part",
+            "Second Part",
+            "Statistics",
+        ])
+        .add_rows(results.iter().map(|result| {
             [
-                day.to_string(),
+                result.year.to_string(),
+                result.day.to_string(),
+                match &result.label {
+                    Some(label) => label.to_string(),
+                    None => "-".to_string(),
+                },
                 format!(
                     "{}{}",
                     validated_to_string(result.part_1_validated),
@@ -90,7 +125,7 @@ fn main() -> anyhow::Result<()> {
         }))
         .add_row_if(
             |_, _| results.len() > 1,
-            vec!["Total", "-", "-", &format!("{:?}", total_time)],
+            vec!["", "", "", "", "", &format!("{:?}", total_time)],
         );
 
     println!("{table}");
@@ -106,16 +141,16 @@ fn validated_to_string(validated: Option<bool>) -> impl std::fmt::Display {
     }
 }
 
-fn solve(year: u16, day: u8, solver: DaySolver, test: bool) -> anyhow::Result<DayResult> {
+fn solve(solver: &DaySolver, test: bool) -> anyhow::Result<DayResult> {
     let runner = if test {
-        get_test_runner(year, day)?
+        get_test_io_driver(solver.year, solver.day)?
     } else {
-        get_input_runner(year, day)?
+        get_online_io_driver(solver.year, solver.day)?
     };
     let inputs = runner.get_inputs();
     let inputs = inputs.map(|s| s.trim_end());
-    let (part_1, part_2, stats) = match solver {
-        DaySolver::Mono(s) => match inputs {
+    let (part_1, part_2, stats) = match &solver.implementation {
+        DaySolverImpl::Mono(s) => match inputs {
             MaybeShared::Shared(input) => {
                 let ((part_1, part_2), stats) = instrument(|| s.solve(input));
                 (part_1, part_2, MaybeShared::Shared(stats))
@@ -126,7 +161,7 @@ fn solve(year: u16, day: u8, solver: DaySolver, test: bool) -> anyhow::Result<Da
                 (part_1, part_2, MaybeShared::Separate(stats_1, stats_2))
             }
         },
-        DaySolver::Dual(s) => {
+        DaySolverImpl::Dual(s) => {
             let (part_1, stats_1) = instrument(|| s.solve_1(inputs.first()));
             let (part_2, stats_2) = instrument(|| s.solve_2(inputs.second()));
 
@@ -142,6 +177,9 @@ fn solve(year: u16, day: u8, solver: DaySolver, test: bool) -> anyhow::Result<Da
         .and_then(|r| runner.validate(Part::Two, &r));
 
     Ok(DayResult {
+        day: solver.day,
+        year: solver.year,
+        label: solver.label,
         part_1,
         part_1_validated,
         part_2,
@@ -150,7 +188,7 @@ fn solve(year: u16, day: u8, solver: DaySolver, test: bool) -> anyhow::Result<Da
     })
 }
 
-fn get_input_runner(year: u16, day: u8) -> anyhow::Result<Box<dyn Runner>> {
+fn get_online_io_driver(year: u16, day: u8) -> anyhow::Result<Box<dyn IODriver>> {
     let mut path = PathBuf::from("inputs").join(year.to_string());
     std::fs::create_dir_all(&path)?;
     path.push(day.to_string());
@@ -183,7 +221,7 @@ fn get_input_runner(year: u16, day: u8) -> anyhow::Result<Box<dyn Runner>> {
         input: String,
     }
 
-    impl Runner for RealRunner {
+    impl IODriver for RealRunner {
         fn get_inputs(&self) -> MaybeShared<&str> {
             MaybeShared::Shared(&self.input)
         }
@@ -194,7 +232,7 @@ fn get_input_runner(year: u16, day: u8) -> anyhow::Result<Box<dyn Runner>> {
     }))
 }
 
-fn get_test_runner(year: u16, day: u8) -> anyhow::Result<Box<dyn Runner>> {
+fn get_test_io_driver(year: u16, day: u8) -> anyhow::Result<Box<dyn IODriver>> {
     let mut path = PathBuf::from("tests").join(year.to_string());
     std::fs::create_dir_all(&path)?;
     path.push(day.to_string());
@@ -227,7 +265,7 @@ fn get_test_runner(year: u16, day: u8) -> anyhow::Result<Box<dyn Runner>> {
         answer_2: String,
     }
 
-    impl Runner for TestRunner {
+    impl IODriver for TestRunner {
         fn get_inputs(&self) -> MaybeShared<&str> {
             self.inputs.as_deref()
         }
@@ -254,6 +292,9 @@ fn get_test_runner(year: u16, day: u8) -> anyhow::Result<Box<dyn Runner>> {
 }
 
 struct DayResult {
+    year: u16,
+    day: u8,
+    label: Option<&'static str>,
     part_1: PartResult,
     part_1_validated: Option<bool>,
     part_2: PartResult,
@@ -267,7 +308,7 @@ enum Part {
     Two,
 }
 
-trait Runner {
+trait IODriver {
     fn get_inputs(&self) -> MaybeShared<&str>;
     fn validate(&self, _part: Part, _solution: &str) -> Option<bool> {
         None
