@@ -1,6 +1,7 @@
 use common::prelude::*;
 
 use chumsky::prelude::*;
+use itertools::{repeat_n, Itertools};
 use rayon::prelude::*;
 
 register_solver!(2024, 7, Solver);
@@ -88,19 +89,7 @@ fn generate_all_variants_iter<const N: usize>(
     variants: [Operator; N],
     length: usize,
 ) -> impl Iterator<Item = Vec<Operator>> {
-    let num_variants = variants.len();
-
-    (0..num_variants.pow(length as u32)).map(move |index| {
-        let mut combination = Vec::with_capacity(length);
-        let mut idx = index;
-
-        for _ in 0..length {
-            combination.push(variants[idx % num_variants]);
-            idx /= num_variants;
-        }
-
-        combination
-    })
+    repeat_n(variants, length).multi_cartesian_product()
 }
 
 fn num_digits_in_base_10(n: i64) -> u32 {
