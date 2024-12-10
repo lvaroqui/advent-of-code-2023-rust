@@ -35,12 +35,12 @@ impl<T> Map<T> {
         })
     }
 
-    pub fn adjacent_iter(&self, pos: Vec2) -> impl Iterator<Item = &T> {
-        self.adjacent_pos_iter(pos)
+    pub fn eight_adjacent_iter(&self, pos: Vec2) -> impl Iterator<Item = &T> {
+        self.eight_adjacent_pos_iter(pos)
             .map(|pos| &self.0[pos.y as usize][pos.x as usize])
     }
 
-    pub fn adjacent_pos_iter(&self, pos: Vec2) -> impl Iterator<Item = Vec2> + '_ {
+    pub fn eight_adjacent_pos_iter(&self, pos: Vec2) -> impl Iterator<Item = Vec2> + '_ {
         let x = pos.x;
         let y = pos.y;
         [
@@ -56,6 +56,33 @@ impl<T> Map<T> {
             vec2(x - 1, y + 1),
             vec2(x, y + 1),
             vec2(x + 1, y + 1),
+        ]
+        .into_iter()
+        .filter(|&pos| {
+            pos.x >= 0
+                && pos.x < self.0[0].len() as i64
+                && pos.y >= 0
+                && pos.y < self.0.len() as i64
+        })
+    }
+
+    pub fn four_adjacent_iter(&self, pos: Vec2) -> impl Iterator<Item = &T> {
+        self.four_adjacent_pos_iter(pos)
+            .map(|pos| &self.0[pos.y as usize][pos.x as usize])
+    }
+
+    pub fn four_adjacent_pos_iter(&self, pos: Vec2) -> impl Iterator<Item = Vec2> + '_ {
+        let x = pos.x;
+        let y = pos.y;
+        [
+            // Above
+            vec2(x, y - 1),
+            // Left
+            vec2(x - 1, y),
+            // Right
+            vec2(x + 1, y),
+            // Bellow
+            vec2(x, y + 1),
         ]
         .into_iter()
         .filter(|&pos| {

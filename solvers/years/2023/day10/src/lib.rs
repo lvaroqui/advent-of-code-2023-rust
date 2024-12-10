@@ -100,7 +100,7 @@ impl DualDaySolver for Solver {
         loop {
             let to_add = inner_parts
                 .iter()
-                .flat_map(|p| map.adjacent_pos_iter(*p))
+                .flat_map(|p| map.eight_adjacent_pos_iter(*p))
                 .filter(|p| !inner_parts.contains(p) && !pipe_parts.contains(p))
                 .collect::<HashSet<_>>();
             if to_add.is_empty() {

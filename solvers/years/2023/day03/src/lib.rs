@@ -125,7 +125,7 @@ fn solve<NumberMetadata: Default>(
                 c.value += 10_u32.pow(c.digit_index) * *digit as u32;
                 c.digit_index += 1;
 
-                for a in map.adjacent_iter(vec2(x as i64, y as i64)) {
+                for a in map.eight_adjacent_iter(vec2(x as i64, y as i64)) {
                     inspect_number_neighbor(&mut c.metadata, a);
                 }
             } else {
