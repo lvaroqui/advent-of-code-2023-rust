@@ -3,6 +3,7 @@ use std::fmt::Display;
 pub mod inventory;
 pub mod macros;
 pub mod map;
+pub mod math_helper;
 pub mod prelude;
 
 #[derive(Default)]

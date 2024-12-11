@@ -12,6 +12,7 @@ num = "0.4.1"
 enum-iterator = "2.1"
 common = { path = "common" }
 rayon = "1.10"
+cached = "0.54.0"
 
 [profile.release]
 debug = true

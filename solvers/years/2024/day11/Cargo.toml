@@ -7,3 +7,4 @@ edition = "2021"
 common.workspace = true
 itertools.workspace = true
 chumsky.workspace = true
+cached.workspace = true
