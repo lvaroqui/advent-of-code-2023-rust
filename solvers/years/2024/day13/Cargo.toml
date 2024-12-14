@@ -1,0 +1,9 @@
+[package]
+name = "year2024_day13"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common.workspace = true
+itertools.workspace = true
+chumsky.workspace = true
