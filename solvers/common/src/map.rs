@@ -117,7 +117,7 @@ impl<T> std::ops::Index<Vec2> for Map<T> {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub struct Vec2 {
     pub x: i64,
     pub y: i64,
@@ -159,6 +159,10 @@ impl Vec2 {
         let x_rotated = (x * angle.cos()) - (y * angle.sin());
         let y_rotated = (y * angle.cos()) + (x * angle.sin());
         vec2(x_rotated as i64, y_rotated as i64)
+    }
+
+    pub fn square_norm(&self) -> i64 {
+        self.x * self.x + self.y * self.y
     }
 }
 
@@ -217,6 +221,17 @@ impl std::ops::Sub<Vec2> for i64 {
     }
 }
 
+impl std::ops::Mul<Vec2> for Vec2 {
+    type Output = Vec2;
+
+    fn mul(self, rhs: Vec2) -> Self::Output {
+        Vec2 {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+        }
+    }
+}
+
 impl std::ops::Mul<i64> for Vec2 {
     type Output = Vec2;
 
@@ -233,5 +248,30 @@ impl std::ops::Mul<Vec2> for i64 {
 
     fn mul(self, rhs: Vec2) -> Self::Output {
         rhs.mul(self)
+    }
+}
+
+impl std::ops::Div<i64> for Vec2 {
+    type Output = Vec2;
+
+    fn div(self, rhs: i64) -> Self::Output {
+        Vec2 {
+            x: self.x / rhs,
+            y: self.y / rhs,
+        }
+    }
+}
+
+impl std::ops::Div<Vec2> for i64 {
+    type Output = Vec2;
+
+    fn div(self, rhs: Vec2) -> Self::Output {
+        rhs.div(self)
+    }
+}
+
+impl std::iter::Sum for Vec2 {
+    fn sum<I: Iterator<Item = Vec2>>(iter: I) -> Self {
+        iter.fold(Vec2::default(), |acc, v| acc + v)
     }
 }
