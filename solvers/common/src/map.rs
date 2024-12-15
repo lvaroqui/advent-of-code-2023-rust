@@ -109,11 +109,29 @@ impl<T> Map<T> {
     }
 }
 
+impl<T: std::fmt::Display> std::fmt::Display for Map<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for l in &self.0 {
+            for c in l {
+                write!(f, "{}", c)?;
+            }
+            writeln!(f)?;
+        }
+        Ok(())
+    }
+}
+
 impl<T> std::ops::Index<Vec2> for Map<T> {
     type Output = T;
 
     fn index(&self, pos: Vec2) -> &Self::Output {
         &self.0[pos.y as usize][pos.x as usize]
+    }
+}
+
+impl<T> std::ops::IndexMut<Vec2> for Map<T> {
+    fn index_mut(&mut self, pos: Vec2) -> &mut Self::Output {
+        &mut self.0[pos.y as usize][pos.x as usize]
     }
 }
 
