@@ -135,7 +135,7 @@ impl<T> std::ops::IndexMut<Vec2> for Map<T> {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Vec2 {
     pub x: i64,
     pub y: i64,
