@@ -14,6 +14,8 @@ common = { path = "common" }
 rayon = "1.10"
 cached = "0.54.0"
 petgraph = { version = "0.6.5", features = ["rayon"] }
+pathfinding = "4.12"
+tinyvec = "1.8.0"
 
 [profile.release]
 debug = true

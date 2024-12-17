@@ -9,3 +9,5 @@ itertools.workspace = true
 chumsky.workspace = true
 petgraph.workspace = true
 enum-iterator.workspace = true
+pathfinding.workspace = true
+tinyvec.workspace = true

@@ -7,12 +7,54 @@ use common::{
 
 use chumsky::prelude::*;
 use itertools::Itertools;
+use pathfinding::directed::astar::astar_bag;
 use petgraph::{algo::astar, prelude::*};
 
 register_solver!(2024, 16, Solver);
 pub struct Solver;
 
 impl MonoDaySolver for Solver {
+    fn solve(&self, input: &str) -> (PartResult, PartResult) {
+        let map = parser().parse(input).unwrap();
+
+        let start_pos = map.iter().find(|(_, c)| **c == Cell::Start).unwrap().0;
+        let end_pos = map.iter().find(|(_, c)| **c == Cell::End).unwrap().0;
+
+        let (solution, cost) = astar_bag(
+            &(start_pos, Vec2::EAST),
+            |(p, d)| {
+                let p = *p;
+                let d = *d;
+                let mut edges = tinyvec::ArrayVec::<[_; 3]>::default();
+                if map.get(p + d).map(|c| c.is_path()).unwrap_or(false) {
+                    edges.push(((p + d, d), 1));
+                }
+                edges.push(((p, d.rotate(FRAC_PI_2)), 1000));
+                edges.push(((p, d.rotate(-FRAC_PI_2)), 1000));
+                edges
+            },
+            |_| 0,
+            |n| n.0 == end_pos,
+        )
+        .unwrap();
+
+        (
+            PartResult::new(cost),
+            PartResult::new(
+                solution
+                    .flatten()
+                    .map(|(p, _)| p)
+                    .collect::<HashSet<_>>()
+                    .len(),
+            ),
+        )
+    }
+}
+
+register_solver!(2024, 16, SolverPetgraph, "petgraph");
+pub struct SolverPetgraph;
+
+impl MonoDaySolver for SolverPetgraph {
     fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let map = parser().parse(input).unwrap();
 
