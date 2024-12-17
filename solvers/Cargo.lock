@@ -914,6 +914,7 @@ checksum = "62f822373a4fe84d4bb149bf54e584a7f4abec90e072ed49cda0edea5b95471f"
 dependencies = [
  "equivalent",
  "hashbrown 0.15.2",
+ "rayon",
 ]
 
 [[package]]
@@ -1226,6 +1227,7 @@ checksum = "b4c5cc86750666a3ed20bdaf5ca2a0344f9c67674cae0515bec2da16fbaa47db"
 dependencies = [
  "fixedbitset",
  "indexmap",
+ "rayon",
 ]
 
 [[package]]

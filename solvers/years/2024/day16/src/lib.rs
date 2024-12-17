@@ -1,7 +1,4 @@
-use std::{
-    collections::HashMap,
-    f32::consts::{FRAC_PI_2, PI},
-};
+use std::{collections::HashSet, f32::consts::FRAC_PI_2};
 
 use common::{
     map::{Map, Vec2},
@@ -9,53 +6,89 @@ use common::{
 };
 
 use chumsky::prelude::*;
-use petgraph::{algo::dijkstra, prelude::*};
+use itertools::Itertools;
+use petgraph::{algo::astar, prelude::*};
 
 register_solver!(2024, 16, Solver);
 pub struct Solver;
 
-impl DualDaySolver for Solver {
-    fn solve_1(&self, input: &str) -> PartResult {
+impl MonoDaySolver for Solver {
+    fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let map = parser().parse(input).unwrap();
 
-        let mut graph: GraphMap<(Vec2, Vec2), i64, Undirected> = GraphMap::new();
-
-        for (p, _) in map.iter().filter(|(_, c)| c.is_path()) {
-            for d in [Vec2::NORTH, Vec2::EAST, Vec2::SOUTH, Vec2::WEST] {
-                graph.add_node((p, d));
-            }
-        }
-        let mut edges = vec![];
-        for (p, d) in graph.nodes() {
-            if map.get(p + d).map(|c| c.is_path()).unwrap_or(false) {
-                edges.push(((p, d), (p + d, d), 1));
-            }
-            edges.push(((p, d), (p, d.rotate(FRAC_PI_2)), 1000));
-        }
-
-        for (from, to, weight) in edges {
-            graph.add_edge(from, to, weight);
-        }
+        let graph = build_graph(&map);
 
         let start_pos = map.iter().find(|(_, c)| **c == Cell::Start).unwrap().0;
         let end_pos = map.iter().find(|(_, c)| **c == Cell::End).unwrap().0;
 
-        let res = dijkstra(
-            &graph,
-            (start_pos, Vec2::EAST),
-            Some((end_pos, Vec2::NORTH)),
-            |(_from, _to, weight)| *weight,
-        );
+        let mut nodes = HashSet::new();
+        let mut edges: HashSet<((Vec2, Vec2), (Vec2, Vec2))> = HashSet::new();
 
-        let res = res
-            .iter()
-            .filter(|((p, _), _)| *p == end_pos)
-            .map(|(_, cost)| cost)
-            .min()
+        // For part 2, we repeat A* algorithm in a loop.
+        //
+        // On each iteration, all edges on the shortest path are marked as
+        // visited and will be weighted a tiny bit more for next iteration.
+        //
+        // If another shorter path passing by new nodes exists, we should find
+        // it, as its edges won't have the penalty and therefore weight less.
+        //
+        // If we do not find any new node on an iteration, we found all shorter
+        // paths.
+        loop {
+            let (cost, path) = astar(
+                &graph,
+                (start_pos, Vec2::EAST),
+                |n| n.0 == end_pos,
+                |e| {
+                    let bias = if edges.contains(&(e.source(), e.target())) {
+                        1
+                    } else {
+                        0
+                    };
+                    *e.weight() * 1000 + bias
+                },
+                |_| 0, // Ensure to find shortest path with estimator to 0
+            )
             .unwrap();
 
-        PartResult::new(res)
+            edges.extend(path.iter().tuple_windows().map(|(a, b)| (*a, *b)));
+            let before = nodes.len();
+            nodes.extend(path.iter().map(|(p, _)| *p));
+            if nodes.len() == before {
+                let biases = path
+                    .iter()
+                    .tuple_windows()
+                    .filter(|(a, b)| edges.contains(&(**a, **b)))
+                    .count();
+                let path_cost = (cost - biases as i64) / 1000;
+
+                return (PartResult::new(path_cost), PartResult::new(nodes.len()));
+            }
+        }
     }
+}
+
+fn build_graph(map: &Map<Cell>) -> GraphMap<(Vec2, Vec2), i64, Directed> {
+    let mut graph: GraphMap<(Vec2, Vec2), i64, Directed> = GraphMap::new();
+
+    for (p, _) in map.iter().filter(|(_, c)| c.is_path()) {
+        for d in [Vec2::NORTH, Vec2::EAST, Vec2::SOUTH, Vec2::WEST] {
+            graph.add_node((p, d));
+        }
+    }
+    let mut edges = vec![];
+    for (p, d) in graph.nodes() {
+        if map.get(p + d).map(|c| c.is_path()).unwrap_or(false) {
+            edges.push(((p, d), (p + d, d), 1));
+        }
+        edges.push(((p, d), (p, d.rotate(FRAC_PI_2)), 1000));
+        edges.push(((p, d), (p, d.rotate(-FRAC_PI_2)), 1000));
+    }
+
+    for (from, to, weight) in edges {
+        graph.add_edge(from, to, weight);
+    }
+    graph
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -92,5 +125,7 @@ fn parser() -> impl Parser<char, Map<Cell>, Error = Simple<char>> {
 
     let line = cell.repeated().at_least(1);
 
-    line.separated_by(text::newline()).map(Map::new)
+    line.separated_by(text::newline())
+        .map(Map::new)
+        .then_ignore(end())
 }

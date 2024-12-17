@@ -13,7 +13,7 @@ enum-iterator = "2.1"
 common = { path = "common" }
 rayon = "1.10"
 cached = "0.54.0"
-petgraph = "0.6.5"
+petgraph = { version = "0.6.5", features = ["rayon"] }
 
 [profile.release]
 debug = true
