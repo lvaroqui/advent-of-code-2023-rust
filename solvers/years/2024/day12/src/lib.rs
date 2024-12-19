@@ -133,8 +133,8 @@ fn explore_region(visited: &mut HashSet<Vec2>, map: &Map<char>, pos: Vec2) -> Re
 
     let region_stats = RegionStats {
         area: 1,
-        perimeters: map
-            .four_adjacent_pos_iter_unchecked(pos)
+        perimeters: pos
+            .four_adjacent_iter()
             .filter(|p| match map.get(*p) {
                 Some(c) => map[pos] != *c,
                 None => true,

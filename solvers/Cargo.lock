@@ -917,6 +917,7 @@ dependencies = [
  "year2024_day15",
  "year2024_day16",
  "year2024_day17",
+ "year2024_day18",
 ]
 
 [[package]]
@@ -2599,6 +2600,16 @@ dependencies = [
  "itertools",
  "rayon",
  "tinyvec",
+]
+
+[[package]]
+name = "year2024_day18"
+version = "0.1.0"
+dependencies = [
+ "chumsky",
+ "common",
+ "itertools",
+ "pathfinding",
 ]
 
 [[package]]
