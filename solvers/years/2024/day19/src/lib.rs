@@ -1,3 +1,4 @@
+use cached::Cached;
 use common::prelude::*;
 
 use chumsky::prelude::*;
@@ -13,13 +14,13 @@ impl MonoDaySolver for Solver {
         let (a, b) = input
             .designs
             .iter()
-            .enumerate()
-            .map(|(i, d)| {
-                println!("{}", i);
+            .map(|d| {
+                VALIDATE.lock().unwrap().cache_clear();
                 validate(d, &input.patterns, 0)
             })
             .tee();
 
+        VALIDATE.lock().unwrap().cache_clear();
         (
             PartResult::new(a.filter(|i| *i > 0).count()),
             PartResult::new(b.sum::<usize>()),
@@ -27,7 +28,10 @@ impl MonoDaySolver for Solver {
     }
 }
 
-#[cached::proc_macro::cached]
+#[cached::proc_macro::cached(
+    key = "(usize, usize)",
+    convert = r#"{ (target.len(), pattern_index) }"#
+)]
 fn validate(
     target: &'static [Color],
     patterns: &'static [Vec<Color>],
