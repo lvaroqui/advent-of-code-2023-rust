@@ -918,6 +918,7 @@ dependencies = [
  "year2024_day16",
  "year2024_day17",
  "year2024_day18",
+ "year2024_day19",
 ]
 
 [[package]]
@@ -2610,6 +2611,17 @@ dependencies = [
  "common",
  "itertools",
  "pathfinding",
+]
+
+[[package]]
+name = "year2024_day19"
+version = "0.1.0"
+dependencies = [
+ "cached",
+ "chumsky",
+ "common",
+ "itertools",
+ "rayon",
 ]
 
 [[package]]
