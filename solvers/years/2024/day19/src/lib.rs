@@ -1,8 +1,8 @@
-use cached::Cached;
+use cached::{Cached, UnboundCache};
 use common::prelude::*;
 
 use chumsky::prelude::*;
-use itertools::Itertools;
+use rayon::prelude::*;
 
 register_solver!(2024, 19, Solver);
 pub struct Solver;
@@ -10,33 +10,31 @@ pub struct Solver;
 impl MonoDaySolver for Solver {
     fn solve(&self, input: &str) -> (PartResult, PartResult) {
         let input = Box::leak(Box::new(parser().parse(input).unwrap()));
-
-        let (a, b) = input
+        let mut res = vec![];
+        input
             .designs
-            .iter()
-            .map(|d| {
-                VALIDATE.lock().unwrap().cache_clear();
-                validate(d, &input.patterns, 0)
-            })
-            .tee();
+            .par_iter()
+            .map(|d| validate(&mut UnboundCache::new(), d, &input.patterns, 0))
+            .collect_into_vec(&mut res);
 
-        VALIDATE.lock().unwrap().cache_clear();
         (
-            PartResult::new(a.filter(|i| *i > 0).count()),
-            PartResult::new(b.sum::<usize>()),
+            PartResult::new(res.iter().filter(|i| **i > 0).count()),
+            PartResult::new(res.iter().sum::<usize>()),
         )
     }
 }
 
-#[cached::proc_macro::cached(
-    key = "(usize, usize)",
-    convert = r#"{ (target.len(), pattern_index) }"#
-)]
 fn validate(
+    cache: &mut UnboundCache<(u8, u8), usize>,
     target: &'static [Color],
     patterns: &'static [Vec<Color>],
     pattern_index: usize,
 ) -> usize {
+    let cache_key = (target.len() as u8, pattern_index as u8);
+    if let Some(c) = cache.cache_get(&cache_key) {
+        return *c;
+    }
+
     if pattern_index >= patterns.len() {
         return 0;
     }
@@ -47,13 +45,15 @@ fn validate(
         if target.len() == pattern.len() {
             1
         } else {
-            validate(&target[pattern.len()..], patterns, 0)
+            validate(cache, &target[pattern.len()..], patterns, 0)
         }
     } else {
         0
     };
 
-    res + validate(target, patterns, pattern_index + 1)
+    let res = res + validate(cache, target, patterns, pattern_index + 1);
+    cache.cache_set(cache_key, res);
+    res
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
