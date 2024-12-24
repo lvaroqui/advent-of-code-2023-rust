@@ -182,6 +182,10 @@ impl Vec2 {
         ]
         .into_iter()
     }
+
+    pub fn manhattan_dist(&self, other: &Vec2) -> i64 {
+        (other.x - self.x).abs() + (other.y - self.y).abs()
+    }
 }
 
 impl std::ops::Add for Vec2 {
